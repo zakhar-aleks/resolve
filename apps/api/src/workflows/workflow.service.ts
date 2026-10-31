@@ -176,6 +176,7 @@ export class WorkflowService {
         archivedAt: null,
       };
       await manager.save(WorkflowEntity, {
+        lifecycle:result.state,accessMode:result.mode,updatedAt:result.updatedAt,createdAt:result.createdAt,archivedAt:result.archivedAt??null,
         id,
         idempotencyKey: input.idempotencyKey,
         requestHash,
