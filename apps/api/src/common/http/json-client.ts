@@ -11,7 +11,7 @@ export async function requestJson<T>(
 ): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(url, { ...init, signal: AbortSignal.timeout(25000) });
+    response = await fetch(url, { ...init, redirect: 'error', signal: AbortSignal.timeout(25000) });
   } catch {
     throw new ProviderError(null);
   }

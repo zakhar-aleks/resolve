@@ -4,6 +4,7 @@ import { z } from 'zod';
 config({ path: resolve(process.cwd(), '../../.env'), quiet: true });
 config({ quiet: true });
 const schema = z.object({
+  INTERNAL_API_TOKEN: z.string().default(''),
   DATABASE_URL: z.string().default('postgresql://resolve:resolve@127.0.0.1:55432/resolve'),
   API_PORT: z.coerce.number().int().default(8788),
   WEB_ORIGIN: z.url().default('http://127.0.0.1:8787'),
