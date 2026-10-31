@@ -148,3 +148,9 @@ The official Socket Mode SDK receives mentions without a public webhook. Workspa
 Open `/?view=workflows` for delivery address changes, returns/replacements, appointment changes, account recovery, notification preferences and reviewed privacy requests. All six change durable fictional service records with policy/evidence checks and explicit approval. They are not pretend receipts for real services.
 
 Run `npm run agent:keys`, restart the API, and use `/api/v1/agent` with separate intake and reviewer Bearer credentials. `GET /schema` supplies OpenAPI 3.1. The optional HTTPS company connector provides live execution and read-only reconciliation. See [the API, service connector, and Slack guide](docs/agent-api.md) for schemas, examples, permissions and deployment requirements. Slack mentions now identify these workflows; an optional bot token enables a threaded acknowledgement.
+
+## Live policy prompts and complexity routing
+
+Saved company, action-permission and privacy settings now compose the system instructions sent to Mistral. A fixed foundation emphasises polite support, privacy, security and verified outcomes. Company & policies includes a read-only preview. Every run records the policy snapshot hash, and policy changes invalidate unexecuted recommendations and action plans.
+
+Small-model routing is the default; complex requests go to the support team unless the company enables adaptive routing and an administrator configures `MISTRAL_LARGE_MODEL`. Jev remains optional, and human-only / AI-off / rules-only processing bypasses all external routing. See [policy prompts and evaluation](docs/policy-prompts.md) for behaviour, concurrency handling and opt-in live tests.
