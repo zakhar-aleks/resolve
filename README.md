@@ -162,3 +162,7 @@ Run `npm run agent:keys` to generate the workspace password and internal API tok
 Only the landing page, privacy notice, terms and built assets are public. Intake, API documentation, workspace views, fragments and every action require authentication. Mutations require the configured `WEB_ORIGIN`; configure the exact public HTTPS origin before deployment. Nest operator APIs additionally require `X-Resolve-Internal` using `INTERNAL_API_TOKEN`, which Astro adds only on server requests. Agent routes retain separate intake/reviewer Bearer checks. Nest remains on loopback; do not expose it or forward operator routes publicly. Keep database ports private.
 
 Security headers prevent embedding and restrict scripts/resources to this origin. Provider HTTP redirects are rejected. API-wide requests are limited to 600/minute and message intake to 20/minute per process (shared fixed windows); use a trusted gateway with per-client limits before public deployment or scaling. Credentials are shared demo secrets: revoke by rotation and restart. Named users, MFA, tenant isolation, managed secrets, monitoring and independent security review remain outstanding.
+
+## Docker deployment
+
+For a protected DigitalOcean/Debian demo with automatic HTTPS, use [the deployment guide](docs/deployment.md). `Dockerfile` builds a non-root Debian-based app image; `compose.deploy.yaml` runs it with private PostgreSQL and Caddy. Only ports 80/443 are published. `compose.yaml` remains the local-development database configuration.
