@@ -40,8 +40,27 @@ const text = COPY.product;
         </div><h2>{text.previewSubject}</h2><p>{text.previewSummary}</p><div
           class="preview-guidance"
         >
-          <span>{COPY.symbols.pass}</span><p>{text.trust[1]}</p>
+          <span>{COPY.symbols.pass}</span><p>{text.previewGuidance}</p>
         </div><div class="preview-action">{text.previewAction}<span>{COPY.productMark}</span></div>
+      </div>
+    </section>
+    <section id="privacy" class="landing-split">
+      <div>
+        <p class="eyebrow">{COPY.privacy.eyebrow}</p><h2>{text.privacyTitle}</h2><p>
+          {text.privacyBody}
+        </p><p class="privacy-boundary">{text.privacyBoundary}</p><a
+          href="/?view=privacy"
+          class="text-link">{text.privacyLink}</a
+        >
+      </div><div class="privacy-promise">
+        {
+          text.principles.map((item) => (
+            <p>
+              <span>{COPY.symbols.pass}</span>
+              {item}
+            </p>
+          ))
+        }
       </div>
     </section>
     <section id="how-it-works" class="landing-section">
@@ -57,22 +76,6 @@ const text = COPY.product;
                 <p>{step.body}</p>
               </>
             </article>
-          ))
-        }
-      </div>
-    </section>
-    <section class="landing-split">
-      <div>
-        <p class="eyebrow">{COPY.privacy.eyebrow}</p><h2>{text.privacyTitle}</h2><p>
-          {text.privacyBody}
-        </p><a href="/?view=privacy" class="text-link">{text.privacyLink}</a>
-      </div><div class="privacy-promise">
-        {
-          text.principles.map((item) => (
-            <p>
-              <span>{COPY.symbols.pass}</span>
-              {item}
-            </p>
           ))
         }
       </div>

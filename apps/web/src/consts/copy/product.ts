@@ -1,14 +1,14 @@
 export const PRODUCT_COPY = {
   product: {
-    eyebrow: 'CUSTOMER SUPPORT, FOLLOWED THROUGH',
-    headline: 'Less back-and-forth.\nMore problems solved.',
+    eyebrow: 'CUSTOMER SUPPORT · PRIVACY AT THE CENTRE',
+    headline: 'Resolve the request.\nRespect the person.',
     description:
-      'Resolve turns incoming customer messages into clear summaries and practical next steps—so your team can focus on helping people.',
+      'Help customers with clear summaries and practical next steps, while keeping their data in mind. Privacy controls and GDPR readiness are part of your team’s everyday support.',
     open: 'Open your workspace',
     learn: 'See how it works',
     privacy: 'Privacy & data',
     home: 'Home',
-    trust: ['Prepared on arrival', 'Your company’s policies', 'People stay in control'],
+    trust: ['External AI off by default', 'Human-only support choices', 'GDPR readiness checklist'],
     previewLabel: 'YOUR TEAM’S NEXT REQUEST',
     previewName: 'Maya Chen',
     previewSubject: 'A duplicate payment, already understood.',
@@ -17,6 +17,7 @@ export const PRODUCT_COPY = {
     previewTag: 'Billing',
     previewState: 'Ready for review',
     previewAction: 'Review refund',
+    previewGuidance: 'Checked against your company’s policy',
     howTitle: 'From a message to a resolution.',
     howDescription: 'One place for the question, the context, and the action that puts it right.',
     steps: [
@@ -33,19 +34,21 @@ export const PRODUCT_COPY = {
         body: 'Your team reviews the recommendation, approves eligible actions, and sees a clear record of what happened.',
       },
     ],
-    privacyTitle: 'Customer care includes caring for their data.',
+    privacyTitle: 'Privacy controls. A clear path to GDPR readiness.',
     privacyBody:
-      'Choose when external AI may be used, respect human-only requests, and set retention for closed conversations. A privacy readiness checklist helps your company document the work still needed.',
+      'Decide how customer information is handled before enabling external AI. Set retention, respect human-only requests, and work through ten European privacy readiness steps with an accountable owner and evidence for each.',
     privacyLink: 'Explore privacy controls',
+    privacyBoundary:
+      'Built-in controls support your privacy work. Compliance also depends on your company’s contracts, deployment, and operating procedures.',
     slackTitle: 'Meet your team where they already work.',
     slackBody:
       'Mention Resolve in a connected Slack channel to bring a request into the inbox. Tags, ownership, and a prepared summary keep everyone aligned.',
     slackSetup:
       'Your administrator connects Slack using an app token, a workspace ID, and approved channel IDs. Add the app to those channels and mention it to create a request. Add #human-only to keep a request out of external AI.',
     principles: [
-      'No payment action from a Slack mention',
-      'Only approved channels are read',
-      'No claim of automatic GDPR compliance',
+      'Choose whether external AI can process requests',
+      'Remove expired closed-conversation content',
+      'Document responsibilities, providers, and safeguards',
     ],
     finalTitle: 'Give every request a clear next step.',
     finalBody:
