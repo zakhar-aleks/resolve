@@ -67,8 +67,8 @@ export class WorkflowService {
   }
   async list(access: WorkflowAccess): Promise<Workflow[]> {
     const query = this.data.getRepository(WorkflowEntity).createQueryBuilder('workflow');
-    if (access === 'demo') query.where("workflow.result->>'mode' = :mode", { mode: 'demo' });
-    const rows = await query.orderBy("workflow.result->>'createdAt'", 'DESC').take(100).getMany();
+    if (access === 'demo') query.where('workflow.accessMode = :mode', { mode: 'demo' });
+    const rows = await query.orderBy('workflow.createdAt', 'DESC').take(100).getMany();
     return rows.map((row) => row.result);
   }
   async get(id: string, access: WorkflowAccess): Promise<Workflow> {

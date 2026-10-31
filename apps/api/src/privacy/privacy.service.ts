@@ -81,7 +81,7 @@ export class PrivacyService {
         .getRepository(WorkflowEntity)
         .createQueryBuilder('workflow')
         .where(
-          "workflow.result->>'state' IN ('blocked','succeeded','failed') AND workflow.result->>'archivedAt' IS NULL AND workflow.result->>'updatedAt' < :cutoff",
+          "workflow.lifecycle IN ('blocked','succeeded','failed') AND workflow.archivedAt IS NULL AND workflow.updatedAt < :cutoff",
           { cutoff },
         )
         .setLock('pessimistic_write')
