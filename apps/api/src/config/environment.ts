@@ -13,6 +13,21 @@ const schema = z.object({
   SLACK_APP_TOKEN: z.string().default(''),
   SLACK_TEAM_ID: z.string().default(''),
   SLACK_CHANNEL_IDS: z.string().default(''),
+  RESOLVE_API_KEY: z.string().default(''),
+  RESOLVE_REVIEWER_KEY: z.string().default(''),
+  SERVICE_CONNECTOR_URL: z
+    .union([
+      z.literal(''),
+      z.url().refine((value) => {
+        const url = new URL(value);
+        return (
+          url.protocol === 'https:' && !url.username && !url.password && !url.search && !url.hash
+        );
+      }),
+    ])
+    .default(''),
+  SERVICE_CONNECTOR_TOKEN: z.string().default(''),
+  SLACK_BOT_TOKEN: z.string().default(''),
   JEV_MODEL: z.string().default('jev-latest'),
   STRIPE_SECRET_KEY: z.string().default(''),
   STRIPE_TEST_CUSTOMER_ID: z.string().default(''),
