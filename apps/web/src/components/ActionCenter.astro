@@ -1,0 +1,169 @@
+---
+import type { AppState } from '@resolve/contracts';
+import { COPY } from '../consts/copy';
+import { workflowCards, currentAppointment } from '../services/workflow-view';
+import PageHeading from './PageHeading.astro';
+import ActionForm from './ActionForm.astro';
+import WorkflowInputs from './WorkflowInputs.astro';
+import WorkflowReview from './WorkflowReview.astro';
+interface Props {
+  state: AppState;
+}
+const { state } = Astro.props;
+const text = COPY.workflows;
+const demo = state.demoService;
+const cards = workflowCards(state);
+---
+
+<PageHeading eyebrow={text.eyebrow} title={text.title} description={text.description} /><div
+  class="privacy-intro"
+>
+  <b>{text.demo}</b><p>{text.demoNote}</p><p>{text.connectedNote}</p><a
+    class="text-link"
+    href="/agent-api">{text.apiGuide}</a
+  >
+</div>
+{
+  demo && (
+    <div class="workflow-grid">
+      {cards.map((card) => (
+        <section class="panel settings-card">
+          <h2>{card.title}</h2>
+          <p class="body-copy">{card.body}</p>
+          <ActionForm action="prepare-workflow" view="workflows" class="workflow-form">
+            <input type="hidden" name="kind" value={card.kind} />
+            <input type="hidden" name="idempotencyKey" value={card.idempotencyKey} />
+            <WorkflowInputs kind={card.kind} demo={demo} />
+            <button class="button-secondary" type="submit" disabled={!card.enabled}>
+              {text.prepare}
+            </button>
+          </ActionForm>
+        </section>
+      ))}
+    </div>
+  )
+}
+<section class="workflow-history">
+  <h2>{text.history}</h2>{
+    state.workflows.length === 0 ? (
+      <p class="body-copy">{text.empty}</p>
+    ) : (
+      state.workflows.map((workflow) => <WorkflowReview workflow={workflow} />)
+    )
+  }
+</section>
+{
+  demo && (
+    <details class="panel settings-card">
+      <>
+        <summary>{text.current}</summary>
+        <dl class="workflow-records">
+          <>
+            <div>
+              <>
+                <dt>{text.order}</dt>
+                <dd>{demo.order.id}</dd>
+              </>
+            </div>
+            <div>
+              <>
+                <dt>{text.address}</dt>
+                <dd>
+                  {demo.order.address.line1}
+                  {COPY.separators.dot}
+                  {demo.order.address.city}
+                  {COPY.separators.dot}
+                  {demo.order.address.postalCode}
+                </dd>
+              </>
+            </div>
+            <div>
+              <>
+                <dt>{text.stock}</dt>
+                <dd>{demo.returnOrder.stock}</dd>
+              </>
+            </div>
+            <div>
+              <>
+                <dt>{text.handled}</dt>
+                <dd>{demo.returnOrder.returned}</dd>
+              </>
+            </div>
+            <div>
+              <>
+                <dt>{text.appointment}</dt>
+                <dd>{currentAppointment(state)}</dd>
+              </>
+            </div>
+            <div>
+              <>
+                <dt>{text.marketing}</dt>
+                <dd>{demo.preferences.marketingEmail ? text.on : text.off}</dd>
+              </>
+            </div>
+            <div>
+              <>
+                <dt>{text.recoveryCount}</dt>
+                <dd>{demo.account.recoveryRequests.length}</dd>
+              </>
+            </div>
+            <div>
+              <>
+                <dt>{text.privacyCount}</dt>
+                <dd>{demo.privacyRequests.length}</dd>
+              </>
+            </div>
+          </>
+        </dl>
+      </>
+    </details>
+  )
+}
+<details class="panel settings-card">
+  <summary>{text.policyTitle}</summary><p class="body-copy">{text.policyNote}</p><ActionForm
+    action="workflow-policy"
+    view="workflows"
+    class="workflow-form"
+    ><input name="revision" type="hidden" value={state.workflowPolicy.revision} /><div
+      class="form-grid"
+    >
+      {
+        cards.map((card) => (
+          <label class="check-option">
+            <input name={card.kind} type="checkbox" checked={card.enabled} />
+            {card.title}
+          </label>
+        ))
+      }
+    </div><div class="form-grid">
+      <label
+        >{text.maxValue}<input
+          name="maxReplacementCents"
+          type="number"
+          min="0"
+          max="100000"
+          value={state.workflowPolicy.maxReplacementCents}
+          required
+        /></label
+      ><label
+        >{text.returnDays}<input
+          name="returnWindowDays"
+          type="number"
+          min="1"
+          max="365"
+          value={state.workflowPolicy.returnWindowDays}
+          required
+        /></label
+      ><label
+        >{text.recoveryLimit}<input
+          name="maxRecoveryPerDay"
+          type="number"
+          min="1"
+          max="10"
+          value={state.workflowPolicy.maxRecoveryPerDay}
+          required
+        /></label
+      >
+    </div><button class="button-secondary" type="submit">{text.savePolicy}</button></ActionForm
+  >
+</details>

@@ -4,6 +4,7 @@ import { COPY } from '../consts/copy';
 import Sidebar from './Sidebar.astro';
 import SupportInbox from './SupportInbox.astro';
 import CompanySettings from './CompanySettings.astro';
+import ActionCenter from './ActionCenter.astro';
 import PrivacyCenter from './PrivacyCenter.astro';
 import Connections from './Connections.astro';
 interface Props {
@@ -36,6 +37,8 @@ const { model } = Astro.props;
     }{
       model.view === 'support' ? (
         <SupportInbox model={model} />
+      ) : model.view === 'workflows' ? (
+        <ActionCenter state={model.state} />
       ) : model.view === 'company' ? (
         <CompanySettings company={model.state.company} />
       ) : model.view === 'privacy' ? (

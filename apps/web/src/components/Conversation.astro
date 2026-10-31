@@ -111,6 +111,19 @@ const view = supportPresentation(model);
         </section>
       )
     }
+    {
+      record.suggestedAction && (
+        <div class="summary-card">
+          <>
+            <h3>{COPY.workflows.kinds[record.suggestedAction].title}</h3>
+            <p>{COPY.workflows.kinds[record.suggestedAction].body}</p>
+            <a class="text-link" href="/?view=workflows">
+              {COPY.workflows.prepare}
+            </a>
+          </>
+        </div>
+      )
+    }
     <RequestManagement record={record} />
     <details class="request-activity">
       <summary>{text.details}</summary>{

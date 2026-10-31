@@ -1,0 +1,52 @@
+@layer components {
+  .workflow-grid {
+    @apply mb-10 grid grid-cols-2 gap-5;
+  }
+  .workflow-grid h2 {
+    @apply mb-3 text-lg;
+  }
+  .workflow-form {
+    @apply mt-6 grid gap-5;
+  }
+  .workflow-history {
+    @apply my-10 grid gap-5;
+  }
+  .workflow-history > h2 {
+    @apply text-2xl;
+  }
+  .workflow-review {
+    @apply rounded-lg p-6;
+  }
+  .workflow-review .card-heading {
+    @apply mb-4 flex flex-wrap items-center justify-between gap-4;
+  }
+  .workflow-review > p {
+    @apply text-sm leading-7 text-muted;
+  }
+  .workflow-review pre {
+    @apply my-4 overflow-x-auto rounded-lg bg-base p-4 text-xs leading-6 text-muted;
+  }
+  .workflow-checks {
+    @apply my-5 grid gap-2;
+  }
+  .workflow-checks li {
+    @apply flex justify-between gap-5 border-b border-line py-2 text-sm text-muted;
+  }
+  .workflow-review code {
+    @apply ml-3 break-all;
+  }
+  .workflow-records {
+    @apply my-5 grid gap-4 text-sm;
+  }
+  .workflow-records > div {
+    @apply flex flex-wrap justify-between gap-3;
+  }
+  .workflow-records dt {
+    @apply text-muted;
+  }
+}
+@media (max-width: 900px) {
+  .workflow-grid {
+    @apply grid-cols-1;
+  }
+}
