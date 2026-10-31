@@ -30,3 +30,23 @@ jobs:
       - run: npm test
       - run: npm run test:integration
       - run: npm run build
+
+  container:
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/deployment-env.mjs ci.example.invalid
+      - run: docker compose --env-file .env.deploy -f compose.deploy.yaml config --quiet
+      - run: docker compose --env-file .env.deploy -f compose.deploy.yaml up -d --build --wait --wait-timeout 180 app postgres
+      - name: Check private boundaries inside container
+        run: >-
+          docker compose --env-file .env.deploy -f compose.deploy.yaml exec -T app
+          node --input-type=module -e
+          "for (const url of ['http://127.0.0.1:8787/?view=support','http://127.0.0.1:8787/fragments/workspace','http://127.0.0.1:8788/api/state']) { const r = await fetch(url); if (r.status !== 401) throw new Error('Private route exposed: ' + url); }"
+      - name: Stop containers
+        if: always()
+        run: docker compose --env-file .env.deploy -f compose.deploy.yaml down
