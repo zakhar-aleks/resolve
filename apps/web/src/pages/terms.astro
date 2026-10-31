@@ -1,0 +1,16 @@
+---
+import { COPY } from '../consts/copy';
+import AppLayout from '../layouts/AppLayout.astro';
+import PublicHeader from '../components/PublicHeader.astro';
+import PublicFooter from '../components/PublicFooter.astro';
+---
+
+<AppLayout
+  ><div class="public-site">
+    <PublicHeader /><main class="legal-main">
+      <p class="eyebrow">{COPY.privacy.updated}</p><h1>{COPY.privacy.termsTitle}</h1><p>
+        {COPY.privacy.termsBody}
+      </p><a href="/privacy-policy" class="text-link">{COPY.product.notice}</a>
+    </main><PublicFooter />
+  </div></AppLayout
+>
