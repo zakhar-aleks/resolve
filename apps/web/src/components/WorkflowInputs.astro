@@ -82,7 +82,7 @@ const text = COPY.workflows;
 {kind === 'recover_account' && <p class="field-note">{text.recoveryNote}</p>}
 {
   kind === 'update_preferences' && (
-    <div>
+    <div class="workflow-options">
       <>
         <label class="check-option">
           <input type="checkbox" name="marketingEmail" checked={demo.preferences.marketingEmail} />

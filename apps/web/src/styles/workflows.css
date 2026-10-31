@@ -1,6 +1,34 @@
 @layer components {
   .workflow-grid {
-    @apply mb-10 grid grid-cols-2 gap-5;
+    @apply mb-10 grid auto-rows-fr grid-cols-2 gap-5;
+  }
+  .workflow-card {
+    @apply flex min-w-0 flex-col;
+  }
+  .workflow-card > .body-copy {
+    @apply mb-0;
+    min-block-size: 3.5rem;
+  }
+  .workflow-card > .workflow-form {
+    @apply mt-5 flex flex-1 flex-col;
+  }
+  .workflow-fields {
+    @apply flex-1;
+  }
+  .workflow-fields > .field-note {
+    @apply mt-0;
+  }
+  .workflow-card .workflow-form label {
+    @apply m-0;
+  }
+  .workflow-card .form-grid {
+    @apply mb-0;
+  }
+  .workflow-options {
+    @apply grid gap-4;
+  }
+  .workflow-card .workflow-form > button {
+    @apply mt-auto w-full;
   }
   .workflow-grid h2 {
     @apply mb-3 text-lg;
@@ -47,6 +75,6 @@
 }
 @media (max-width: 900px) {
   .workflow-grid {
-    @apply grid-cols-1;
+    @apply auto-rows-auto grid-cols-1;
   }
 }

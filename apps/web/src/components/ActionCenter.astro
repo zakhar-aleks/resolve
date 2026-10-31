@@ -27,13 +27,15 @@ const cards = workflowCards(state);
   demo && (
     <div class="workflow-grid">
       {cards.map((card) => (
-        <section class="panel settings-card">
+        <section class="panel settings-card workflow-card">
           <h2>{card.title}</h2>
           <p class="body-copy">{card.body}</p>
           <ActionForm action="prepare-workflow" view="workflows" class="workflow-form">
             <input type="hidden" name="kind" value={card.kind} />
             <input type="hidden" name="idempotencyKey" value={card.idempotencyKey} />
-            <WorkflowInputs kind={card.kind} demo={demo} />
+            <div class="workflow-fields">
+              <WorkflowInputs kind={card.kind} demo={demo} />
+            </div>
             <button class="button-secondary" type="submit" disabled={!card.enabled}>
               {text.prepare}
             </button>
