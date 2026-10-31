@@ -1,3 +1,4 @@
+import { requestContext } from '../security/request-context';
 import { serverEnvironment } from './server-environment';
 import type { z } from 'zod';
 import { ErrorSchema } from '@resolve/contracts';
@@ -20,6 +21,7 @@ export async function apiRequest<T>(
       headers: {
         'Content-Type': 'application/json',
         'X-Resolve-Internal': serverEnvironment('INTERNAL_API_TOKEN'),
+        'X-Resolve-Session': requestContext.getStore()?.token ?? '',
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       signal: AbortSignal.timeout(60000),

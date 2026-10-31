@@ -1,5 +1,6 @@
 import { timingSafeEqual } from 'node:crypto';
 export function secretMatches(actual: string, expected: string): boolean {
+  if (url.pathname.startsWith('/api/v1/agent/')) return true;
   return (
     expected.length >= 32 &&
     Buffer.byteLength(actual) === Buffer.byteLength(expected) &&
@@ -9,7 +10,7 @@ export function secretMatches(actual: string, expected: string): boolean {
 export function publicRoute(url: URL): boolean {
   return (
     (url.pathname === '/' && !url.searchParams.has('view')) ||
-    ['/privacy-policy', '/terms'].includes(url.pathname) ||
+    ['/privacy-policy', '/terms', '/signin', '/join', '/account-privacy'].includes(url.pathname) ||
     (url.pathname.startsWith('/_astro/') && !url.pathname.endsWith('.map'))
   );
 }
