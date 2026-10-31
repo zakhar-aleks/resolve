@@ -23,7 +23,6 @@ document.addEventListener('change', (event) => {
 });
 document.addEventListener('htmx:afterSwap', () => {
   document.querySelector<HTMLDialogElement>('#case-dialog')?.close();
-  window.scrollTo({ top: 0, behavior: 'instant' });
 });
 document.addEventListener('htmx:sendError', () => {
   const error = document.querySelector<HTMLElement>('#network-error');
@@ -31,4 +30,14 @@ document.addEventListener('htmx:sendError', () => {
     error.hidden = false;
     error.textContent = COPY.errors.NETWORK;
   }
+});
+
+document.addEventListener('htmx:beforeRequest', (event) => {
+  if (
+    event.target instanceof Element &&
+    event.target.matches('[data-triage-refresh]') &&
+    (document.activeElement?.matches('input,textarea,select') ||
+      document.querySelector('dialog[open],details[open]'))
+  )
+    event.preventDefault();
 });

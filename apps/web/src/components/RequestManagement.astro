@@ -1,0 +1,43 @@
+---
+import type { SupportCase } from '@resolve/contracts';
+import { COPY } from '../consts/copy';
+import ActionForm from './ActionForm.astro';
+interface Props {
+  record: SupportCase;
+}
+const { record } = Astro.props;
+const text = COPY.experience;
+---
+
+<details class="request-management">
+  <summary>{text.manage}</summary><ActionForm action="manage" caseId={record.id}
+    ><div class="form-grid">
+      <label
+        >{text.tags}<input name="tags" value={record.tags.join(', ')} maxlength="260" /><small
+          >{text.tagsHint}</small
+        ></label
+      ><label
+        >{text.owner}<input
+          name="assignee"
+          value={record.assignee}
+          maxlength="80"
+          placeholder={text.ownerPlaceholder}
+        /></label
+      ><label
+        >{text.status}<select name="status"
+          ><option value="open" selected={record.status === 'open'}>{text.open}</option><option
+            value="waiting"
+            selected={record.status === 'waiting'}>{text.waiting}</option
+          ><option value="resolved" selected={record.status === 'resolved'}>{text.resolved}</option
+          ></select
+        ></label
+      >
+    </div><label class="check-option"
+      ><input
+        type="checkbox"
+        name="humanOnly"
+        checked={record.aiPreference === 'human_only'}
+      /><span>{text.humanOnly}<small>{text.humanOnlyHint}</small></span></label
+    ><button type="submit" class="button-secondary">{text.save}</button></ActionForm
+  >
+</details>

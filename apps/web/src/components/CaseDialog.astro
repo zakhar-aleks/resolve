@@ -7,13 +7,15 @@ const text = COPY.support;
 <dialog id="case-dialog">
   <ActionForm action="create"
     ><div class="dialog-title">
-      <div><p class="eyebrow">{text.newCaseEyebrow}</p><h2>{text.newCaseTitle}</h2></div><button
+      <div>
+        <p class="eyebrow">{text.newCaseEyebrow}</p><h2>{COPY.experience.newRequestTitle}</h2>
+      </div><button
         type="button"
         data-close-dialog
         class="icon-button"
-        aria-label={text.newCaseTitle}>{COPY.symbols.close}</button
+        aria-label={COPY.experience.newRequestTitle}>{COPY.symbols.close}</button
       >
-    </div><p class="field-note">{text.newCaseBody}</p><div class="form-grid">
+    </div><p class="field-note">{COPY.experience.newRequestBody}</p><div class="form-grid">
       <label
         >{text.customerName}<input
           name="name"
@@ -62,6 +64,7 @@ const text = COPY.support;
         required
         maxlength="4000"
         placeholder={COPY.placeholders.message}></textarea></label
-    ><button class="button-primary full-width" type="submit">{text.create}</button></ActionForm
+    ><button class="button-primary full-width" type="submit">{COPY.experience.create}</button
+    ></ActionForm
   >
 </dialog>
