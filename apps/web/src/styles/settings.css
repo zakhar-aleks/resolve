@@ -1,0 +1,110 @@
+@layer components {
+  .settings-grid {
+    @apply mt-8 grid items-start gap-5;
+    grid-template-columns: minmax(350px, 1fr) 280px;
+  }
+  .settings-main {
+    @apply grid gap-5;
+  }
+  .settings-card {
+    @apply p-6;
+  }
+  .card-heading {
+    @apply mb-6;
+  }
+  .card-heading p,
+  .provider-heading p {
+    @apply mt-2 text-[10px] text-muted;
+  }
+  .form-grid {
+    @apply grid grid-cols-2 gap-4;
+  }
+  .settings-card label {
+    @apply mb-5;
+  }
+  .field-note {
+    @apply muted-copy mt-4 text-[9px];
+  }
+  .policy-editor {
+    @apply min-h-60 font-mono text-[11px];
+  }
+  .import-row {
+    @apply cluster justify-between;
+  }
+  .file-button {
+    @apply m-0 cursor-pointer rounded-md border border-line px-3 py-2 text-[10px] text-accent;
+  }
+  .file-button input {
+    @apply hidden;
+  }
+  .inline-note {
+    @apply my-4 rounded-md border border-accent/15 bg-soft/70 p-3 text-[10px] leading-6 text-accent/90;
+  }
+  .inline-note p {
+    @apply mt-1;
+  }
+  .toggle-row {
+    @apply m-0! flex items-center justify-between gap-5 border-t border-line py-4;
+  }
+  .toggle-row b {
+    @apply text-xs font-normal text-ink;
+  }
+  .toggle-row small {
+    @apply mt-1 block text-[10px] text-muted;
+  }
+  .toggle-row input {
+    @apply relative h-5 w-9 shrink-0 cursor-pointer appearance-none rounded-full border border-line bg-raised;
+  }
+  .toggle-row input::after {
+    content: '';
+    @apply absolute left-1 top-1 size-2.5 rounded-full bg-muted transition-transform;
+  }
+  .toggle-row input:checked {
+    @apply border-accent/40 bg-accent/50;
+  }
+  .toggle-row input:checked::after {
+    @apply translate-x-4 bg-ink;
+  }
+  .settings-summary {
+    @apply sticky top-6 p-6;
+  }
+  .company-preview-mark {
+    @apply mb-4 mt-6 grid size-12 place-items-center rounded-xl border border-accent/20 bg-soft text-xl text-accent;
+  }
+  .settings-summary > h2 {
+    @apply break-words text-xl font-medium;
+  }
+  .settings-summary > p:not(.eyebrow) {
+    @apply mt-2 text-[10px] text-muted;
+  }
+  .summary-line {
+    @apply flex justify-between gap-4 border-b border-line py-3 text-[10px];
+  }
+  .summary-line span {
+    @apply text-muted;
+  }
+  .summary-line b {
+    @apply text-right font-normal text-ink/80;
+  }
+  .connections-grid {
+    @apply mt-8 grid grid-cols-2 gap-5;
+  }
+  .provider-heading {
+    @apply cluster mb-6 justify-between;
+  }
+  .body-copy {
+    @apply mb-5 text-xs leading-7 text-muted;
+  }
+  .standalone-form {
+    @apply mt-3;
+  }
+  .text-link {
+    @apply mt-4 inline-block text-xs text-accent;
+  }
+  .text-link:hover {
+    @apply underline;
+  }
+  .stack-title {
+    @apply mb-5 mt-4 text-xl;
+  }
+}

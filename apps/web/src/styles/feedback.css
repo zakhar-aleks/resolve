@@ -1,0 +1,48 @@
+@layer components {
+  .notice {
+    @apply mb-6 rounded-md border border-positive/20 bg-positive/5 p-4 text-xs text-positive;
+  }
+  .notice.is-error {
+    @apply border-negative/20 bg-negative/5 text-negative;
+  }
+  .error-message {
+    @apply mt-3 text-xs leading-6 text-negative;
+  }
+  dialog {
+    @apply max-h-[90vh] w-[min(540px,calc(100vw-30px))] overflow-auto rounded-xl border border-line bg-surface p-6 text-ink shadow-2xl;
+    margin: auto;
+  }
+  dialog::backdrop {
+    @apply bg-black/60 backdrop-blur-sm;
+  }
+  .dialog-title {
+    @apply cluster mb-4 items-start justify-between;
+  }
+  .dialog-title h2 {
+    @apply mt-2 text-xl;
+  }
+  .dialog-title + p {
+    @apply mb-5;
+  }
+  dialog label {
+    @apply mb-4;
+  }
+  .icon-button {
+    @apply bg-transparent px-1 text-2xl text-muted;
+  }
+  .request-indicator {
+    @apply pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 bg-accent opacity-0 transition-opacity;
+  }
+  .request-indicator.htmx-request {
+    @apply opacity-100;
+  }
+  .network-error {
+    @apply fixed bottom-5 right-5 z-50 rounded-md border border-negative bg-surface p-4 text-xs text-negative;
+  }
+  .unavailable {
+    @apply mx-auto max-w-xl py-24;
+  }
+  .unavailable p {
+    @apply my-5 text-muted;
+  }
+}
