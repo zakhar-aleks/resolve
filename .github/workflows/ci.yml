@@ -1,0 +1,32 @@
+name: Quality
+on:
+  push:
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: resolve
+          POSTGRES_PASSWORD: resolve
+          POSTGRES_DB: resolve
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U resolve -d resolve"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npm run test:integration
+      - run: npm run build
