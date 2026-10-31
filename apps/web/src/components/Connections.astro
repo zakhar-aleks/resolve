@@ -6,8 +6,9 @@ import ActionForm from './ActionForm.astro';
 import PageHeading from './PageHeading.astro';
 interface Props {
   connections: AppState['connections'];
+  slack: AppState['slack'];
 }
-const { connections } = Astro.props;
+const { connections, slack } = Astro.props;
 const text = COPY.connections;
 ---
 
@@ -75,21 +76,18 @@ const text = COPY.connections;
     </div><p class="body-copy">{text.billingBody}</p><p class="field-note">{text.billingNote}</p>
   </section>
   <section class="panel settings-card">
-    <p class="eyebrow">{text.stackEyebrow}</p><h2 class="stack-title">{text.stackTitle}</h2>{
-      [
-        [text.frontend, text.frontendValue],
-        [text.backend, text.backendValue],
-        [text.database, text.databaseValue],
-        [text.contracts, text.contractsValue],
-        [text.model, text.modelValue],
-      ].map(([label, value]) => (
-        <div class="summary-line">
-          <>
-            <span>{label}</span>
-            <b>{value}</b>
-          </>
-        </div>
-      ))
-    }
+    <div class="provider-heading">
+      <h2>{COPY.product.slackTitle}</h2><span class="badge"
+        >{
+          slack.connected
+            ? COPY.experience.connected
+            : slack.lastError
+              ? COPY.experience.connectionIssue
+              : COPY.experience.notConnected
+        }</span
+      >
+    </div><p class="body-copy">{COPY.product.slackBody}</p><p class="field-note">
+      {COPY.product.slackSetup}
+    </p>
   </section>
 </div>

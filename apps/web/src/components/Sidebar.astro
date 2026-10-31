@@ -11,7 +11,7 @@ const { companyName, view } = Astro.props;
 ---
 
 <aside class="sidebar">
-  <a href="/" class="brand">{COPY.product}<span>{COPY.productMark}</span></a>
+  <a href="/" class="brand">{COPY.productName}<span>{COPY.productMark}</span></a>
   <div class="sidebar-company">
     <span class="company-avatar">{initials(companyName)}</span><div>
       <b>{companyName}</b><small>{COPY.shell.supportWorkspace}</small>
