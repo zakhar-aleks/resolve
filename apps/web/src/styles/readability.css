@@ -1,0 +1,136 @@
+@layer base {
+  body {
+    color: var(--color-ink);
+    font-size: 15px;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  strong,
+  b {
+    color: var(--color-ink);
+  }
+  label {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+  input:not([type='checkbox']):not([type='hidden']):not([type='file']),
+  select,
+  textarea {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  summary {
+    line-height: 1.8;
+  }
+}
+@layer components {
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+  }
+  .page-description {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .subtle {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .field-note {
+    font-size: 12px;
+    line-height: 1.9;
+  }
+  .badge {
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .nav-link {
+    font-size: 13px;
+  }
+  .nav-link span {
+    color: var(--color-accent);
+  }
+  .sidebar-company b {
+    font-size: 13px;
+  }
+  .sidebar-company small,
+  .sidebar-bottom,
+  .sidebar-bottom small {
+    font-size: 11px;
+  }
+  .breadcrumb,
+  .header-status {
+    font-size: 12px;
+  }
+  .panel-heading h2 {
+    font-size: 14px;
+  }
+  .customer-label b {
+    font-size: 14px;
+  }
+  .customer-label small {
+    font-size: 12px;
+  }
+  .metrics span {
+    font-size: 11px;
+  }
+  .metrics small {
+    font-size: 12px;
+  }
+  .metrics strong {
+    font-size: 27px;
+  }
+  .metrics > div:last-child strong {
+    font-size: 21px;
+  }
+  .metrics > div:last-child small {
+    font-size: 12px;
+  }
+  .payment {
+    font-size: 12px;
+  }
+  .payment b {
+    font-size: 13px;
+  }
+  .button-primary,
+  .button-secondary {
+    font-size: 13px;
+  }
+  .card-heading p,
+  .provider-heading p {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .toggle-row b {
+    font-size: 14px;
+  }
+  .toggle-row small {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .settings-summary > p:not(.eyebrow),
+  .summary-line {
+    font-size: 12px;
+  }
+  .inline-note {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .text-link {
+    font-size: 13px;
+  }
+  .body-copy {
+    font-size: 14px;
+  }
+  .sidebar-bottom small {
+    color: var(--color-muted);
+  }
+  footer {
+    color: var(--color-muted);
+    font-size: 11px;
+    letter-spacing: normal;
+  }
+}
