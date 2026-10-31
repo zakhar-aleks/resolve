@@ -1,3 +1,10 @@
+import {
+  WorkflowKindSchema,
+  WorkflowListSchema,
+  WorkflowPolicySchema,
+  DEFAULT_WORKFLOW_POLICY,
+  DemoStateSchema,
+} from './workflows';
 import { z } from 'zod';
 
 export const ACTIONS = ['refund', 'cancel', 'review', 'request_info'] as const;
@@ -33,6 +40,7 @@ export const CreateCaseSchema = z.strictObject({
 export type CreateCaseInput = z.infer<typeof CreateCaseSchema>;
 export const CaseSchema = CreateCaseSchema.extend({
   amountCents: z.number().int().min(0).max(10000000),
+  suggestedAction: WorkflowKindSchema.nullable().optional(),
   summary: z.string().default(''),
   triageStatus: z.enum(['pending', 'processing', 'ready', 'review']).default('pending'),
   tags: z.array(z.string().max(32)).max(8).default([]),
@@ -218,6 +226,9 @@ export const CaseUpdateSchema = z.strictObject({
 });
 export type CaseUpdateInput = z.infer<typeof CaseUpdateSchema>;
 export const StateSchema = z.object({
+  workflows: WorkflowListSchema.default([]),
+  workflowPolicy: WorkflowPolicySchema.default(DEFAULT_WORKFLOW_POLICY),
+  demoService: DemoStateSchema.optional(),
   company: CompanySchema,
   cases: z.array(CaseSchema),
   runs: z.array(RunSchema),
@@ -275,3 +286,4 @@ export const IntakeSchema = z.strictObject({
 });
 export type IntakeInput = z.infer<typeof IntakeSchema>;
 export const IntakeReceiptSchema = z.object({ reference: z.string() });
+export * from './workflows';
