@@ -1,4 +1,7 @@
 {$PUBLIC_DOMAIN} {
   header Strict-Transport-Security "max-age=31536000"
+  request_body {
+    max_size 80KB
+  }
   reverse_proxy app:8787
 }

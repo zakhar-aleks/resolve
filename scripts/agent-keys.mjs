@@ -13,6 +13,7 @@ for (const name of [
   'RESOLVE_REVIEWER_KEY',
   'WORKSPACE_PASSWORD',
   'INTERNAL_API_TOKEN',
+  'DATA_ENCRYPTION_KEY',
 ]) {
   const pattern = new RegExp(`^${name}=(.*)$`, 'm');
   const existing = content.match(pattern);

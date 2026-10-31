@@ -2,7 +2,7 @@ try {
   for (const [url, headers] of [
     ['http://127.0.0.1:8787/', {}],
     [
-      'http://127.0.0.1:8788/api/state',
+      'http://127.0.0.1:8788/api/auth/health',
       { 'X-Resolve-Internal': process.env.INTERNAL_API_TOKEN ?? '' },
     ],
   ]) {

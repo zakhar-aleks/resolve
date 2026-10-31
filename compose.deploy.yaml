@@ -28,7 +28,12 @@ services:
       POSTGRES_USER: resolve
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run deployment-env first}
       POSTGRES_DB: resolve
-    volumes: [postgres_data:/var/lib/postgresql/data]
+    volumes:
+      - type: bind
+        source: ${POSTGRES_DATA_PATH:?Set a directory on encrypted storage}
+        target: /var/lib/postgresql/data
+        bind:
+          create_host_path: false
     networks: [database]
     healthcheck:
       test: [CMD-SHELL, 'pg_isready -U resolve -d resolve']
@@ -60,6 +65,5 @@ networks:
   database:
     internal: true
 volumes:
-  postgres_data:
   caddy_data:
   caddy_config:

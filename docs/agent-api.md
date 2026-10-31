@@ -1,3 +1,7 @@
+# Company-scoped API update
+
+For signed-in company owners, generate/rotate credentials under **Account & team**. These keys select only that company database. The deployed HTTPS base URL is `https://YOUR_DOMAIN/api/v1/agent`; Astro forwards only this authenticated namespace and does not attach operator secrets or browser sessions. Browser cross-origin calls are not enabled; use a server-side client. Legacy `.env` Agent keys belong only to the explicit local demo mode. See [accounts and encryption](accounts-and-encryption.md).
+
 # Agent API and six support actions
 
 Implemented: typed request preparation, persisted workflows and receipts, policy gates, customer confirmation, reviewer approval, idempotency, single dispatch, read-only reconciliation, and six working PostgreSQL demo actions. Real companies connect their systems through the HTTPS connector contract below. No live order, booking, identity, or messaging credentials are included.
@@ -10,7 +14,7 @@ Base URL: `http://127.0.0.1:8788/api/v1/agent`. Every endpoint requires `Authori
 
 `GET /schema` returns the OpenAPI 3.1 description and JSON Schemas. `GET /capabilities` lists actions. `GET /requests` returns at most 100 recent workflows. `GET /requests/:id` reads one result. `GET /demo` reads only fictional demo resources. `GET /policy` and reviewer-only `PUT /policy` manage enabled actions, value limits, return windows and recovery limits using revision checks.
 
-This remains a single-workspace API. The loopback listener and local host/origin boundary remain enabled. For remote access, use an authenticated HTTPS gateway that forwards only `/api/v1/agent/**` to the local backend with the expected host. Keep the existing operator routes private. Add rate limits and managed credentials; account authentication, tenant isolation, roles tied to named staff, and production deployment review are still needed before multi-company use.
+This remains a single-workspace API. The loopback listener and local host/origin boundary remain enabled. The Astro HTTPS gateway forwards only `/api/v1/agent/**`, with the caller’s scoped Bearer credential; it does not expose operator routes. Keep the existing operator routes private. Add rate limits and managed credentials; account authentication, tenant isolation, roles tied to named staff, and production deployment review are still needed before multi-company use.
 
 ## Message intake
 
