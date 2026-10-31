@@ -1,0 +1,196 @@
+@layer components {
+  .care-promises {
+    @apply mb-6 flex flex-wrap items-center gap-x-7 gap-y-3 rounded-lg border border-line bg-surface px-5 py-4 text-xs text-ink;
+  }
+  .care-promises > span {
+    @apply flex items-center gap-2;
+  }
+  .care-promises > span > span {
+    @apply text-positive;
+  }
+  .care-promises > a {
+    @apply ml-auto text-accent;
+  }
+  .work-grid {
+    grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+    align-items: start;
+  }
+  .case-link h3 {
+    @apply text-sm font-medium text-ink;
+  }
+  .case-link p {
+    @apply mt-2 line-clamp-2 whitespace-normal text-xs leading-6 text-muted;
+  }
+  .case-link > small {
+    @apply mt-3 block text-xs text-muted;
+  }
+  .case-top b {
+    @apply text-xs text-ink;
+  }
+  .case-indicator {
+    @apply ml-auto size-1.5 rounded-full bg-positive;
+  }
+  .case-indicator.needs-attention {
+    background: #d9bc90;
+  }
+  .case-tags,
+  .tag-list {
+    @apply mt-3 flex flex-wrap gap-2;
+  }
+  .case-tags span,
+  .tag {
+    @apply rounded-md border border-line bg-raised px-2 py-1 text-xs text-ink;
+  }
+  .privacy-tag {
+    @apply border-positive/30 text-positive;
+  }
+  .request-status {
+    @apply rounded-full border border-positive/30 bg-positive/5 px-3 py-1.5 text-xs text-positive;
+  }
+  .summary-card {
+    @apply my-6 rounded-lg border border-accent/30 bg-accent/5 p-5;
+  }
+  .summary-card > p:last-child {
+    @apply mt-3 text-base leading-7 text-ink;
+  }
+  .message-section {
+    @apply my-6;
+  }
+  .message-section h3 {
+    @apply mb-3 text-sm text-muted;
+  }
+  .message-section blockquote {
+    @apply rounded-lg border border-line bg-base p-5 text-sm leading-7 text-ink;
+    white-space: pre-wrap;
+  }
+  .recommendation-card {
+    @apply my-6 rounded-lg border border-line p-5;
+  }
+  .recommendation-card h3 {
+    @apply mb-3 mt-3 text-lg text-ink;
+  }
+  .recommendation-card > p {
+    @apply text-sm leading-7 text-muted;
+  }
+  .reply-draft {
+    @apply my-6 rounded-lg border border-positive/30 bg-positive/5 p-5;
+  }
+  .reply-draft h3 {
+    @apply mb-3 text-sm text-positive;
+  }
+  .reply-draft p {
+    @apply text-sm leading-7;
+  }
+  .request-management,
+  .request-activity,
+  .team-activity {
+    @apply mt-5 border-t border-line pt-5 text-sm;
+  }
+  details > summary {
+    @apply cursor-pointer text-ink;
+  }
+  .request-management form {
+    @apply mt-5;
+  }
+  .request-management label {
+    @apply mb-5;
+  }
+  .request-management small {
+    @apply mt-2 block text-xs text-muted;
+  }
+  .request-activity form,
+  .request-activity .receipt {
+    @apply mt-4;
+  }
+  .event {
+    grid-template-columns: 100px minmax(0, 1fr) 80px;
+  }
+  .check-option {
+    @apply my-5 flex items-start gap-3 text-sm text-ink;
+  }
+  .check-option input {
+    @apply mt-1 size-4 shrink-0 accent-accent;
+  }
+  .check-option small {
+    @apply mt-1 block text-xs text-muted;
+  }
+  .privacy-intro {
+    @apply mb-7 rounded-lg border border-accent/30 bg-accent/5 p-5 text-sm leading-7;
+  }
+  .privacy-intro p + p {
+    @apply mt-3;
+  }
+  .privacy-form {
+    @apply grid gap-6;
+  }
+  .privacy-checklist {
+    @apply grid grid-cols-2 gap-5;
+  }
+  .readiness-heading h2 {
+    @apply my-3 text-2xl tracking-tight;
+  }
+  .readiness-heading > p:last-child {
+    @apply max-w-3xl text-sm leading-7 text-muted;
+  }
+  .readiness-card {
+    @apply p-5;
+  }
+  .readiness-card .card-heading {
+    @apply mb-4 flex items-start gap-3;
+  }
+  .readiness-number {
+    @apply rounded-md bg-soft px-2 py-1 text-xs text-accent;
+  }
+  .readiness-card h3 {
+    @apply text-base font-medium text-ink;
+  }
+  .readiness-card > p {
+    @apply text-sm leading-7 text-muted;
+  }
+  .readiness-card .form-grid {
+    @apply mt-5 grid-cols-1;
+  }
+  .readiness-card textarea {
+    @apply min-h-20;
+  }
+  .privacy-launch {
+    @apply rounded-lg border border-negative/30 bg-negative/5 p-5;
+  }
+  .privacy-launch h2 {
+    @apply mb-3 text-lg;
+  }
+  .privacy-launch p {
+    @apply text-sm leading-7 text-muted;
+  }
+  .customer-intake {
+    @apply mt-8 grid gap-5;
+  }
+}
+@media (max-width: 900px) {
+  .work-grid {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+  .privacy-checklist {
+    @apply grid-cols-1;
+  }
+}
+@media (max-width: 720px) {
+  .work-grid {
+    @apply block;
+  }
+  .case-list {
+    @apply max-h-80 flex-col overflow-y-auto;
+  }
+  .care-promises {
+    @apply gap-3;
+  }
+  .care-promises > a {
+    @apply ml-0;
+  }
+  .event {
+    grid-template-columns: 90px 1fr;
+  }
+  .event p {
+    @apply col-span-1;
+  }
+}
