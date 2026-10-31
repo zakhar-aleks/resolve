@@ -10,7 +10,7 @@ node scripts/deployment-env.mjs YOUR_DOMAIN
 bash deploy/kubernetes/deploy.sh registry.digitalocean.com/YOUR_REGISTRY/resolve:YOUR_TAG
 ```
 
-For DigitalOcean Container Registry, after creating the namespace, use its Kubernetes manifest for the pull secret named `registry-resolve` (or change `imagePullSecrets` to your registry's secret name). Do not paste registry tokens into Git, command-line arguments or chat. Build for the cluster node architecture; a typical DOKS node uses linux/amd64, so a Mac ARM build needs `docker buildx build --platform linux/amd64 --push -t IMAGE .`.
+For DigitalOcean Container Registry, run `doctl kubernetes cluster registry add CLUSTER_ID` to enable managed registry integration. The deployment inherits its pull secret from the default service account. Do not paste registry tokens into Git, command-line arguments or chat. Build for the cluster node architecture; a typical DOKS node uses linux/amd64, so a Mac ARM build needs `docker buildx build --platform linux/amd64 --push -t IMAGE .`.
 
 Point your domain's A record to the external IP from `kubectl -n resolve get service resolve-public`. Caddy then provisions HTTPS on ports 80/443. API/database ports are not public. Only the authenticated `/api/v1/agent/**` gateway is exposed; private workspace and operator routes require authenticated sessions. The supplied setup serves a configured domain, not an arbitrary IP hostname.
 
