@@ -10,11 +10,12 @@ const name = `resolve_test_${randomUUID().replaceAll('-', '')}`;
 const url = new URL(base);
 url.pathname = `/${name}`;
 let child;
+const internalToken = 'integration-internal-token-00000000000000000';
 const origin = 'http://127.0.0.1:8798/api';
 async function request(path, method = 'GET', body) {
   const response = await fetch(origin + path, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Resolve-Internal': internalToken },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
   return { status: response.status, body: await response.json() };
@@ -29,6 +30,7 @@ before(
         ...process.env,
         DATABASE_URL: url.href,
         API_PORT: '8798',
+        INTERNAL_API_TOKEN: internalToken,
         RESOLVE_API_KEY: 'integration-agent-key-000000000000000000',
         RESOLVE_REVIEWER_KEY: 'integration-reviewer-key-000000000000000',
         SERVICE_CONNECTOR_URL: '',
@@ -55,7 +57,9 @@ before(
     });
     for (let i = 0; i < 120; i++) {
       try {
-        const response = await fetch(origin + '/state');
+        const response = await fetch(origin + '/state', {
+          headers: { 'X-Resolve-Internal': internalToken },
+        });
         if (response.ok) return;
       } catch {}
       if (child.exitCode !== null) throw new Error(logs);
@@ -638,4 +642,35 @@ test('a recommendation completed after a policy change is discarded, not saved',
     release?.();
     await data.destroy();
   }
+});
+
+test('operator routes reject unauthenticated direct access', async () => {
+  for (const path of ['/state', '/company', '/company/prompt', '/privacy', '/connections']) {
+    assert.equal((await fetch(origin + path)).status, 401);
+    assert.equal(
+      (await fetch(origin + path, { headers: { 'X-Resolve-Internal': 'wrong' } })).status,
+      401,
+    );
+  }
+  assert.equal(
+    (
+      await fetch(origin + '/intake', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      })
+    ).status,
+    401,
+  );
+});
+
+test('operator credentials do not bypass the origin boundary', async () => {
+  assert.equal(
+    (
+      await fetch(origin + '/state', {
+        headers: { 'X-Resolve-Internal': internalToken, Origin: 'https://untrusted.example' },
+      })
+    ).status,
+    403,
+  );
 });
