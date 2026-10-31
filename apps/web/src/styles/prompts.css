@@ -1,0 +1,19 @@
+@layer components {
+  .prompt-preview dl {
+    @apply mb-6 grid gap-3 text-xs;
+  }
+  .prompt-preview dl > div {
+    @apply flex flex-wrap justify-between gap-3;
+  }
+  .prompt-preview dt {
+    @apply text-muted;
+  }
+  .prompt-preview dd {
+    @apply break-all text-ink;
+  }
+  .prompt-preview pre {
+    @apply mt-5 max-h-96 overflow-auto rounded-lg border border-line bg-base p-4 font-mono text-xs leading-6 text-ink;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}

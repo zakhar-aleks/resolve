@@ -7,13 +7,15 @@ export function supportPresentation(model: WorkspaceModel) {
   const { run, operation, record, state } = model;
   const succeeded = operation?.state === 'succeeded';
   const actionable = run !== null && ['refund', 'cancel'].includes(run.decision.action);
-  const currentPolicy = run?.company.revision === state.company.revision;
+  const currentPrompt =
+    Boolean(run?.prompt) &&
+    run?.prompt?.snapshotHash === state.promptPreview?.metadata.snapshotHash;
+  const currentPolicy = currentPrompt && run?.company.revision === state.company.revision;
   const canExecute =
     actionable &&
     currentPolicy &&
     run?.privacyRevision === state.privacy.revision &&
-    record?.triageStatus !== 'pending' &&
-    record?.triageStatus !== 'processing' &&
+    record?.triageStatus === 'ready' &&
     !operation &&
     !record?.archivedAt;
   const canReconcile =

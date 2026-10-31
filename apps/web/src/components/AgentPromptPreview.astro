@@ -1,0 +1,23 @@
+---
+import type { PromptPreview } from '@resolve/contracts';
+import { COPY } from '../consts/copy';
+interface Props {
+  prompt: PromptPreview;
+}
+const { prompt } = Astro.props;
+const text = COPY.company;
+---
+
+<section class="panel settings-card prompt-preview">
+  <div class="card-heading"><h2>{text.promptTitle}</h2><p>{text.promptBody}</p></div><dl>
+    <div><dt>{text.promptVersion}</dt><dd>{prompt.metadata.baseVersion}</dd></div><div>
+      <dt>{text.companyVersion}</dt><dd>{prompt.metadata.companyRevision}</dd>
+    </div><div><dt>{text.actionsVersion}</dt><dd>{prompt.metadata.workflowRevision}</dd></div><div>
+      <dt>{text.privacyVersion}</dt><dd>{prompt.metadata.privacyRevision}</dd>
+    </div>
+  </dl><details>
+    <summary>{text.promptDetails}</summary><pre
+      tabindex="0"
+      aria-label={text.promptAria}>{prompt.systemPrompt}</pre>
+  </details>
+</section>

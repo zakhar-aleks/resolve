@@ -45,6 +45,8 @@ export const FEEDBACK_COPY = {
     INTERNAL_ERROR: 'The request could not be completed. Check the backend logs.',
     API_UNAVAILABLE: 'NestJS is not reachable. Start PostgreSQL and run npm run dev.',
     PLAN_EXPIRED: 'This preparation expired. Check the request again before approving.',
+    EXTERNAL_AI_DISABLED:
+      'External AI is disabled for this request. Your team can continue without it.',
     PLAN_CHANGED:
       'Privacy or action permissions changed. Prepare a new request before approving it.',
     RESOURCE_CHANGED:
