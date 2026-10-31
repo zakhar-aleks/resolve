@@ -26,7 +26,12 @@ export function workspaceModel(
     ) ?? null;
   const operation =
     state.operations.find(
-      (operation) => operation.caseId === record?.id && (!run || operation.runId === run.id),
+      (operation) =>
+        operation.caseId === record?.id &&
+        (!run ||
+          operation.runId === run.id ||
+          record?.status === 'resolved' ||
+          ['dispatched', 'unknown', 'pending'].includes(operation.state)),
     ) ?? null;
   return {
     state,

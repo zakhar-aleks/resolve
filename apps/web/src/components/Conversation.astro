@@ -4,73 +4,135 @@ import type { SupportCase } from '@resolve/contracts';
 import type { WorkspaceModel } from '../types/workspace';
 import { COPY } from '../consts/copy';
 import { formatMoney, initials } from '../utils/format';
-import { supportPresentation } from '../services/support-view';
+import { supportPresentation, receiptLines } from '../services/support-view';
 import ActionForm from './ActionForm.astro';
-import AgentResult from './AgentResult.astro';
+import RequestManagement from './RequestManagement.astro';
 interface Props {
   model: WorkspaceModel;
   record: SupportCase;
 }
 const { model, record } = Astro.props;
-const { state, run, operation } = model;
-const text = COPY.support;
+const { run, operation } = model;
+const text = COPY.experience;
 const view = supportPresentation(model);
 ---
 
 <section class="panel conversation">
   <div class="panel-heading">
-    <div><h2>{record.title}</h2><p class="subtle">{record.customerId}</p></div>
-    <span class="badge">{text.billing}</span>
+    <div>
+      <h2>{record.title}</h2><p class="subtle">
+        {record.channel === 'slack' ? text.slack : text.workspace}
+      </p>
+    </div><span class="request-status"
+      >{
+        record.status === 'resolved'
+          ? text.resolved
+          : record.triageStatus === 'pending' || record.triageStatus === 'processing'
+            ? text.preparing
+            : record.triageStatus === 'review'
+              ? text.review
+              : text.ready
+      }</span
+    >
   </div>
   <div class="conversation-body">
     <div class="customer-label">
-      <span class="avatar">{initials(record.name)}</span>
-      <div><b>{record.name}</b><small>{text.customerRequest}</small></div>
+      <span class="avatar">{initials(record.name)}</span><div>
+        <b>{record.name}</b><small>{record.assignee || text.unassigned}</small>
+      </div>
+    </div><div class="tag-list">
+      {record.tags.map((tag) => <span class="tag">{tag}</span>)}{
+        record.aiPreference === 'human_only' && (
+          <span class="tag privacy-tag">{text.humanOnly}</span>
+        )
+      }
     </div>
-    <ActionForm action="analyze" caseId={record.id}>
-      <label class="sr-only" for="customer-message">{text.message}</label>
-      <textarea id="customer-message" name="message" maxlength="4000" required
-        >{run?.message ?? record.message}</textarea
+    <section class="summary-card">
+      <p class="eyebrow">{text.summary}</p><p>{record.summary || text.noSummary}</p>
+    </section>
+    <section class="message-section">
+      <h3>{text.customerMessage}</h3><blockquote>{record.message}</blockquote>
+    </section>
+    <div class="payment">
+      <b>{text.payment}</b><b
+        >{record.provider === 'unlinked' ? text.unlinked : formatMoney(record.amountCents)}</b
+      >{
+        record.provider !== 'unlinked' && (
+          <>
+            <>
+              <span>
+                {COPY.support.refundedLabel}
+                {COPY.separators.colon} {formatMoney(record.refundedCents)}
+              </span>
+              <span>{copyText.age(record.ageDays)}</span>
+            </>
+          </>
+        )
+      }
+    </div>
+    <section class="recommendation-card">
+      <p class="eyebrow">{text.nextStep}</p><h3>{view.recommendation}</h3><p>{view.description}</p>{
+        run?.decision.rationale && <p>{run.decision.rationale}</p>
+      }{view.stale && <p class="error-message">{COPY.errors.POLICY_CHANGED}</p>}<div
+        class="action-row"
       >
-      <div class="payment">
-        <b>{record.provider === 'stripe' ? text.stripePayment : text.simulatedPayment}</b>
-        <b>{formatMoney(record.amountCents)}</b>
-        <code>{record.paymentId}</code>
-        <span>{copyText.age(record.ageDays)}</span>
-        <span>{text.refundedLabel}{COPY.separators.colon} {formatMoney(record.refundedCents)}</span>
-        <span>{COPY.states[record.subscriptionStatus]}</span>
+        {
+          view.canExecute && run && (
+            <ActionForm action="execute" caseId={record.id}>
+              <>
+                <input type="hidden" name="runId" value={run.id} />
+                <button class="button-primary" type="submit">
+                  {view.actionLabel}
+                </button>
+              </>
+            </ActionForm>
+          )
+        }{
+          view.canReconcile && operation && (
+            <ActionForm action="reconcile" caseId={record.id}>
+              <>
+                <input type="hidden" name="operationId" value={operation.id} />
+                <button class="button-secondary" type="submit">
+                  {COPY.support.reconcile}
+                </button>
+              </>
+            </ActionForm>
+          )
+        }
       </div>
-      <div class="agent-label">
-        <span class="agent-icon">{COPY.symbols.agent}</span>
-        <b>{state.company.agentName}</b>
-        <span class="subtle">{text.agentFlow}</span>
-      </div>
-      <AgentResult model={model} />
-      <button class="button-primary" type="submit">{text.run}</button>
-      {run && <span class="timing subtle">{copyText.elapsed(run.elapsedMs)}</span>}
-    </ActionForm>
-    <div class="action-row">
-      {
-        view.canExecute && run && (
-          <ActionForm action="execute" caseId={record.id}>
-            <input type="hidden" name="runId" value={run.id} />
-            <button class="button-primary" type="submit">
-              {view.actionLabel}
-            </button>
-          </ActionForm>
+    </section>
+    {
+      view.reply && (
+        <section class="reply-draft">
+          <>
+            <h3>{COPY.support.customerDraft}</h3>
+            <p>{view.reply}</p>
+          </>
+        </section>
+      )
+    }
+    <RequestManagement record={record} />
+    <details class="request-activity">
+      <summary>{text.details}</summary>{
+        operation && (
+          <div class="receipt">
+            {receiptLines(operation).map((line) => (
+              <div>
+                <b>
+                  {line.label}
+                  {COPY.separators.colon}
+                </b>{' '}
+                {line.value}
+              </div>
+            ))}
+          </div>
         )
-      }
-      {
-        view.canReconcile && operation && (
-          <ActionForm action="reconcile" caseId={record.id}>
-            <input type="hidden" name="operationId" value={operation.id} />
-            <button class="button-secondary" type="submit">
-              {text.reconcile}
-            </button>
-          </ActionForm>
-        )
-      }
-    </div>
-    <p class="field-note">{text.executionNote}</p>
+      }<ActionForm action="analyze" caseId={record.id}
+        ><input type="hidden" name="message" value={record.message} /><button
+          type="submit"
+          class="button-secondary">{text.refresh}</button
+        ></ActionForm
+      >
+    </details>
   </div>
 </section>

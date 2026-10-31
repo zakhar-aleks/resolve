@@ -8,7 +8,14 @@ export function supportPresentation(model: WorkspaceModel) {
   const succeeded = operation?.state === 'succeeded';
   const actionable = run !== null && ['refund', 'cancel'].includes(run.decision.action);
   const currentPolicy = run?.company.revision === state.company.revision;
-  const canExecute = actionable && currentPolicy && !operation;
+  const canExecute =
+    actionable &&
+    currentPolicy &&
+    run?.privacyRevision === state.privacy.revision &&
+    record?.triageStatus !== 'pending' &&
+    record?.triageStatus !== 'processing' &&
+    !operation &&
+    !record?.archivedAt;
   const canReconcile =
     operation !== null && ['dispatched', 'unknown', 'pending'].includes(operation.state);
   const headline = operation
@@ -59,7 +66,10 @@ export function supportPresentation(model: WorkspaceModel) {
     reply,
     canExecute,
     canReconcile,
-    stale: run !== null && !currentPolicy && !operation,
+    stale:
+      run !== null &&
+      (!currentPolicy || run.privacyRevision !== state.privacy.revision) &&
+      !operation,
     actionLabel:
       run?.decision.action === 'refund'
         ? copyText.refund(formatMoney(run.amountCents))
@@ -96,30 +106,27 @@ export function checkDetail(check: SupportRun['checks'][number]): string {
 }
 
 export function supportMetrics(state: AppState) {
+  const text = COPY.experience;
   return [
     {
-      label: COPY.support.queue,
-      value: copyText.count(state.cases.length),
-      detail: COPY.support.queueDetail,
+      label: text.queue,
+      value: copyText.count(state.cases.filter((record) => record.status !== 'resolved').length),
+      detail: text.queueDetail,
     },
     {
-      label: COPY.support.resolved,
-      value: copyText.count(state.operations.filter((op) => op.state === 'succeeded').length),
-      detail: COPY.support.resolvedDetail,
-    },
-    {
-      label: COPY.support.refunded,
-      value: formatMoney(
-        state.cases
-          .filter((record) => record.provider === 'simulator')
-          .reduce((total, record) => total + record.refundedCents, 0),
+      label: text.attention,
+      value: copyText.count(
+        state.cases.filter(
+          (record) => record.status !== 'resolved' && record.triageStatus === 'review',
+        ).length,
       ),
-      detail: COPY.support.refundedDetail,
+      detail: text.attentionDetail,
     },
     {
-      label: COPY.support.policy,
-      value: COPY.support.policyState,
-      detail: COPY.support.policyDetail,
+      label: text.resolvedLabel,
+      value: copyText.count(state.cases.filter((record) => record.status === 'resolved').length),
+      detail: text.resolvedDetail,
     },
+    { label: text.privacyLabel, value: text.privacyValue, detail: text.privacyDetail },
   ];
 }
