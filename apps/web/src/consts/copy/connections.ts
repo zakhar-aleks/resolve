@@ -1,5 +1,14 @@
 export const CONNECTIONS_COPY = {
   connections: {
+    slackSave: 'Save Slack connection',
+    slackDisconnect:
+      'Leave the app token blank to disconnect. Only company owners can change connections.',
+    slackFields: [
+      { name: 'appToken', label: 'Slack app token', secret: true },
+      { name: 'teamId', label: 'Slack workspace ID', secret: false },
+      { name: 'channelIds', label: 'Approved channel IDs, separated by commas', secret: false },
+      { name: 'botToken', label: 'Optional bot token for acknowledgements', secret: true },
+    ],
     eyebrow: 'WORKSPACE / CONNECTIONS',
     title: 'Connect what you need.',
     description: 'Start with rules. Add Mistral for language and judgment. Jev is optional.',
@@ -12,7 +21,7 @@ export const CONNECTIONS_COPY = {
     connect: 'Connect key ↗',
     test: 'Test access',
     memoryNote:
-      'Keys entered here live only in the NestJS server’s memory until restart. They are never returned to the browser or saved to browser storage. Use .env for persistence.',
+      'Workspace keys are encrypted before database storage. They are never returned in workspace state or saved in browser storage. Only company owners can change connections.',
     console: 'Open Mistral console ↗',
     jev: 'Jev',
     jevDescription: 'Optional specialized decision model',
@@ -30,7 +39,7 @@ export const CONNECTIONS_COPY = {
     billingBody:
       'Simulator actions update PostgreSQL records. Configure an existing Stripe test customer and payment in .env to enable test refunds.',
     billingNote:
-      'Restart after editing .env. Live Stripe keys are rejected. This local operator workspace has no production customer authentication.',
+      'Live Stripe keys are rejected. Real payment connections need company-specific configuration and credentialed testing.',
     stackEyebrow: 'UNDER THE HOOD',
     stackTitle: 'Typed boundaries. Visible decisions.',
     frontend: 'Frontend',

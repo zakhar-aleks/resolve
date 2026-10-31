@@ -1,3 +1,5 @@
+import { apiRequest } from '../wrappers/api-client';
+import { z } from 'zod';
 import { workflowForm, workflowPolicyForm } from '../helpers/workflow-forms';
 import { DEMO_WORKFLOW } from '../consts/workflows';
 import { COPY } from '../consts/copy';
@@ -83,6 +85,15 @@ export async function handleAction(action: string, form: FormData): Promise<Work
         selection.runId = op.runId;
         break;
       }
+      case 'connect-slack':
+        await apiRequest('/connections/slack', z.object({ ok: z.boolean() }), 'POST', {
+          appToken: text(form, 'appToken'),
+          teamId: text(form, 'teamId'),
+          channelIds: text(form, 'channelIds').replaceAll(' ', ''),
+          botToken: text(form, 'botToken'),
+        });
+        selection.view = 'connections';
+        break;
       case 'connect':
         await supportApi.connect(connectionForm(form));
         selection.view = 'connections';

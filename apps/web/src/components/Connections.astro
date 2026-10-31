@@ -88,6 +88,22 @@ const text = COPY.connections;
       >
     </div><p class="body-copy">{COPY.product.slackBody}</p><p class="field-note">
       {COPY.product.slackSetup}
-    </p>
+    </p><ActionForm action="connect-slack" view="connections"
+      >{
+        text.slackFields.map((field) => (
+          <label>
+            {field.label}
+            <input
+              type={field.secret ? 'password' : 'text'}
+              name={field.name}
+              maxlength="2000"
+              autocomplete="off"
+            />
+          </label>
+        ))
+      }<p class="field-note">{text.slackDisconnect}</p><button class="button-secondary"
+        >{text.slackSave}</button
+      ></ActionForm
+    ><p class="field-note"></p>
   </section>
 </div>
