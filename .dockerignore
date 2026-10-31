@@ -11,3 +11,7 @@ node_modules.previous
 *.log
 preview*.png
 work
+
+backups
+**/.env
+**/.env.*

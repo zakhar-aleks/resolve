@@ -10,3 +10,5 @@ node_modules.previous
 
 .env.*
 !.env.example
+
+backups/
