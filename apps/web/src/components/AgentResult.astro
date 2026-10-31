@@ -1,0 +1,44 @@
+---
+import type { WorkspaceModel } from '../types/workspace';
+import { COPY } from '../consts/copy';
+import { supportPresentation, receiptLines } from '../services/support-view';
+interface Props {
+  model: WorkspaceModel;
+}
+const { model } = Astro.props;
+const view = supportPresentation(model);
+const { run, operation } = model;
+---
+
+<div class="agent-output">
+  <h3>{view.headline}</h3>
+  {run && <p>{run.analysis.summary}</p>}
+  <p>{view.description}</p>
+  {run?.decision.rationale && <p>{run.decision.rationale}</p>}
+  {
+    operation && (
+      <div class="receipt">
+        {receiptLines(operation).map((line) => (
+          <div>
+            <b>
+              {line.label}
+              {COPY.separators.colon}
+            </b>{' '}
+            {line.value}
+          </div>
+        ))}
+      </div>
+    )
+  }
+  {
+    view.reply && (
+      <div class="inline-note">
+        <>
+          <b>{COPY.support.customerDraft}</b>
+          <p>{view.reply}</p>
+        </>
+      </div>
+    )
+  }
+  {view.stale && <p class="error-message">{COPY.errors.POLICY_CHANGED}</p>}
+</div>

@@ -1,0 +1,65 @@
+---
+import { copyText } from '../helpers/copy';
+import { COPY } from '../consts/copy';
+import { supportPresentation, checkDetail } from '../services/support-view';
+import { formatMoney } from '../utils/format';
+import type { WorkspaceModel } from '../types/workspace';
+interface Props {
+  model: WorkspaceModel;
+}
+const { model } = Astro.props;
+const view = supportPresentation(model);
+const { run, state } = model;
+const text = COPY.support;
+---
+
+<section class="panel decision">
+  <div class="panel-heading"><h2>{text.decisionBrief}</h2><span>{COPY.productMark}</span></div><div
+    class="decision-body"
+  >
+    <p class="eyebrow">{text.recommended}</p><h3 class="recommendation">{view.recommendation}</h3><p
+      class="subtle"
+    >
+      {view.source}
+    </p>{
+      [
+        { label: text.confidence, value: view.confidence },
+        { label: text.risk, value: view.risk },
+        { label: text.fulfillment, value: view.fulfillment },
+      ].map((score) => (
+        <div class="score">
+          <>
+            <span>{score.label}</span>
+            <b>{score.value}</b>
+          </>
+        </div>
+      ))
+    }<div class="divider"></div><div class="section-label">
+      <span>{text.policyChecks}</span><small
+        >{run?.company.revision ?? state.company.revision}</small
+      >
+    </div><div class="checks">
+      {
+        run ? (
+          run.checks.map((check) => (
+            <div class:list={['check', { 'is-failed': !check.passed }]}>
+              <>
+                <span>{check.passed ? COPY.symbols.pass : COPY.symbols.fail}</span>
+                <div>
+                  {COPY.checks[check.id][0]}
+                  <small>{checkDetail(check)}</small>
+                </div>
+              </>
+            </div>
+          ))
+        ) : (
+          <p class="subtle">{text.checksEmpty}</p>
+        )
+      }
+    </div><div class="policy-note">
+      <p>{copyText.limit(formatMoney(state.company.maximumPaymentCents))}</p><p>
+        {copyText.window(state.company.refundWindowDays)}
+      </p><p>{state.company.duplicateOnly ? COPY.company.duplicates : COPY.reasons.requested}</p>
+    </div>
+  </div>
+</section>
