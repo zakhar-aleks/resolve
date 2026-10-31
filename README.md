@@ -130,3 +130,15 @@ STRIPE_TEST_PAYMENT_INTENT_ID=pi_...
 Restart. The server verifies test mode and customer ownership before adding the connected case. Disable the duplicate-only restriction to test an ordinary eligible refund. Refund submissions use persistent operation IDs as Stripe idempotency keys. Pending, failed, and unknown outcomes never count as confirmed success. Live Stripe keys are rejected. Stripe subscription/uncaptured-payment cancellation is not implemented; subscription cancellation is simulator-only.
 
 This is a **local single-company operator MVP**. Customer replies are drafts, and external email/helpdesk delivery is not connected. Production authentication, tenant isolation, deployment secret storage, background reconciliation scheduling, and calibrated model evaluations remain future work. Live model/payment calls require credentialed validation.
+
+## Product experience
+
+`/` is the public landing page. `/?view=support` opens the team inbox, and `/request-support` accepts a fictional customer request with an external-AI preference. Incoming requests are prepared by a PostgreSQL-backed worker automatically; important billing actions still require operator approval. Requests support tags, ownership, and open/waiting/resolved states. Unlinked requests cannot authorise billing actions.
+
+`/?view=privacy` contains company identity, processing preferences, retention, and ten evidence-backed readiness tasks. `/privacy-policy` renders a draft notice from those settings without exposing internal checklist notes. See [privacy readiness](docs/privacy-readiness.md) for scope and remaining production work.
+
+## Slack intake
+
+Create an internal Slack app using `integrations/slack-manifest.yml`, install it in the intended workspace, and generate an app-level token with `connections:write`. Set `SLACK_APP_TOKEN`, `SLACK_TEAM_ID`, and comma-separated `SLACK_CHANNEL_IDS` on the backend and restart it. Invite the app to each approved channel. Mention `@Resolve` with a support request; add `#human-only` to disable external AI for it.
+
+The official Socket Mode SDK receives mentions without a public webhook. Workspace/channel allowlists, bot rejection and a unique event identity prevent unintended intake and duplicate cases. Events are acknowledged after durable insertion. Mentions do not establish account ownership or permit payment actions. No outbound Slack messages are sent. This adapter needs real Slack credentials for a live connection test; the demo runs without them.
