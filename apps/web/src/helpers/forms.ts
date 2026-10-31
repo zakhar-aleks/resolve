@@ -1,5 +1,9 @@
 import {
   CompanyInputSchema,
+  CaseUpdateSchema,
+  PrivacyProfileSchema,
+  PRIVACY_TASK_IDS,
+  type PrivacyProfile,
   CreateCaseSchema,
   ConnectionInputSchema,
   IdSchema,
@@ -52,4 +56,35 @@ export function connectionForm(form: FormData) {
 }
 export function idForm(form: FormData, name: string): string {
   return IdSchema.parse(text(form, name));
+}
+export function caseManagementForm(form: FormData) {
+  return CaseUpdateSchema.parse({
+    tags: text(form, 'tags')
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean),
+    assignee: text(form, 'assignee'),
+    status: text(form, 'status'),
+    aiPreference: form.has('humanOnly') ? 'human_only' : 'allowed',
+  });
+}
+export function privacyForm(form: FormData): PrivacyProfile {
+  return PrivacyProfileSchema.parse({
+    legalName: text(form, 'legalName'),
+    address: text(form, 'address'),
+    privacyEmail: text(form, 'privacyEmail'),
+    businessRegion: text(form, 'businessRegion'),
+    lawfulBasis: text(form, 'lawfulBasis'),
+    hostingLocation: text(form, 'hostingLocation'),
+    retentionDays: Number(text(form, 'retentionDays')),
+    aiEnabled: form.has('aiEnabled'),
+    redactBeforeAi: form.has('redactBeforeAi'),
+    revision: text(form, 'revision'),
+    tasks: PRIVACY_TASK_IDS.map((id) => ({
+      id,
+      owner: text(form, `${id}.owner`),
+      evidence: text(form, `${id}.evidence`),
+      confirmed: form.has(`${id}.confirmed`),
+    })),
+  });
 }

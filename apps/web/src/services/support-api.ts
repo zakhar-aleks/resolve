@@ -1,5 +1,11 @@
 import {
   StateSchema,
+  PrivacyProfileSchema,
+  PrivacyNoticeSchema,
+  IntakeReceiptSchema,
+  type PrivacyProfile,
+  type CaseUpdateInput,
+  type IntakeInput,
   CompanySchema,
   CaseSchema,
   RunSchema,
@@ -22,4 +28,10 @@ export const supportApi = {
   connect: (input: ConnectionInput) =>
     apiRequest('/connections', ConnectionStatusSchema, 'POST', input),
   testMistral: () => apiRequest('/connections/mistral/test', ConnectionTestSchema, 'POST', {}),
+  savePrivacy: (profile: PrivacyProfile) =>
+    apiRequest('/privacy', PrivacyProfileSchema, 'PUT', profile),
+  notice: () => apiRequest('/privacy/notice', PrivacyNoticeSchema),
+  intake: (input: IntakeInput) => apiRequest('/intake', IntakeReceiptSchema, 'POST', input),
+  updateCase: (id: string, input: CaseUpdateInput) =>
+    apiRequest(`/cases/${encodeURIComponent(id)}`, CaseSchema, 'PATCH', input),
 };

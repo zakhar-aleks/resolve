@@ -1,5 +1,13 @@
 import { COPY } from '../consts/copy';
-import { companyForm, caseForm, connectionForm, idForm, text } from '../helpers/forms';
+import {
+  companyForm,
+  caseForm,
+  connectionForm,
+  idForm,
+  text,
+  privacyForm,
+  caseManagementForm,
+} from '../helpers/forms';
 import { supportApi } from './support-api';
 import { workspaceModel, errorMessage, parseView } from './workspace';
 import type { WorkspaceModel, WorkspaceSelection } from '../types/workspace';
@@ -12,6 +20,14 @@ export async function handleAction(action: string, form: FormData): Promise<Work
   };
   try {
     switch (action) {
+      case 'privacy':
+        await supportApi.savePrivacy(privacyForm(form));
+        selection.view = 'privacy';
+        selection.notice = { kind: 'success', message: COPY.privacy.saved };
+        break;
+      case 'manage':
+        await supportApi.updateCase(selected, caseManagementForm(form));
+        break;
       case 'company':
         await supportApi.saveCompany(companyForm(form));
         selection.view = 'company';
