@@ -74,6 +74,16 @@
   .customer-label small {
     font-size: 12px;
   }
+  .metrics > div {
+    @apply flex flex-col items-start gap-2;
+  }
+  .metrics strong {
+    @apply min-h-8;
+    line-height: 1.2;
+  }
+  .metrics small {
+    @apply min-h-10 self-start pb-0 text-left;
+  }
   .metrics span {
     font-size: 11px;
   }
