@@ -1,0 +1,65 @@
+name: resolve
+services:
+  app:
+    build: .
+    init: true
+    restart: unless-stopped
+    env_file: .env.deploy
+    environment:
+      DATABASE_URL: postgresql://resolve:${POSTGRES_PASSWORD:?Run deployment-env first}@postgres:5432/resolve
+      API_URL: http://127.0.0.1:8788/api
+      WEB_ORIGIN: https://${PUBLIC_DOMAIN:?Set your domain}
+      API_PORT: '8788'
+      HOST: 0.0.0.0
+      PORT: '8787'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [edge, database]
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+  postgres:
+    image: postgres:16-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: resolve
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run deployment-env first}
+      POSTGRES_DB: resolve
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    networks: [database]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U resolve -d resolve']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+  proxy:
+    image: caddy:2
+    restart: unless-stopped
+    environment:
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:?Set your domain}
+    ports: ['80:80', '443:443']
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [edge]
+    depends_on:
+      app:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+networks:
+  edge:
+  database:
+    internal: true
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

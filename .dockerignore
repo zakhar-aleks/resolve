@@ -1,0 +1,13 @@
+.git
+node_modules
+**/node_modules
+node_modules.previous
+**/dist
+**/.astro
+.runtime
+.env
+.env.*
+!.env.example
+*.log
+preview*.png
+work
