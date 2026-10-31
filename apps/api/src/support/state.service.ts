@@ -1,11 +1,11 @@
+import { PolicyContextService } from './prompts/policy-context.service';
+import { WorkflowKindSchema } from '@resolve/contracts';
 import { WorkflowService } from '../workflows/workflow.service';
 import { workflowIntent } from '../workflows/domain/intent';
-import { PrivacyService } from '../privacy/privacy.service';
 import { SlackService } from '../slack/slack.service';
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import type { AppState } from '@resolve/contracts';
-import { CompanyService } from '../company/company.service';
 import { ConnectionsService } from '../connections/connections.service';
 import { CaseEntity } from '../database/entities/case.entity';
 import { RunEntity } from '../database/entities/run.entity';
@@ -15,15 +15,15 @@ import { serializeOperation } from '../billing/mappers/operation.mapper';
 export class StateService {
   constructor(
     private readonly data: DataSource,
-    private readonly company: CompanyService,
     private readonly connections: ConnectionsService,
-    private readonly privacy: PrivacyService,
     private readonly slack: SlackService,
     private readonly workflows: WorkflowService,
+    private readonly policies: PolicyContextService,
   ) {}
   async get(): Promise<AppState> {
+    const snapshot = await this.policies.load();
     const [company, cases, runs, operations, events] = await Promise.all([
-      this.company.get(),
+      Promise.resolve(snapshot.company),
       this.data.getRepository(CaseEntity).find({ order: { receivedAt: 'DESC', id: 'ASC' } }),
       this.data.getRepository(RunEntity).find({ order: { createdAt: 'DESC' }, take: 100 }),
       this.data.getRepository(OperationEntity).find({ order: { createdAt: 'DESC' }, take: 100 }),
@@ -31,14 +31,22 @@ export class StateService {
     ]);
     return {
       company,
+      promptPreview: this.policies.preview(snapshot),
       workflows: await this.workflows.list('demo'),
-      workflowPolicy: await this.workflows.policy(),
+      workflowPolicy: snapshot.workflows,
       demoService: await this.workflows.demoState(),
-      privacy: await this.privacy.get(),
+      privacy: snapshot.privacy,
       slack: this.slack.status(),
       cases: cases.map((record) => ({
         ...record,
-        suggestedAction: workflowIntent(record.message),
+        suggestedAction:
+          WorkflowKindSchema.safeParse(
+            runs.find(
+              (run) =>
+                run.caseId === record.id &&
+                run.result.prompt?.snapshotHash === snapshot.metadata.snapshotHash,
+            )?.result.routing?.scenario,
+          ).data ?? workflowIntent(record.message),
       })),
       runs: runs.map((run) => run.result),
       operations: operations.map(serializeOperation),

@@ -1,3 +1,5 @@
+import { PolicyContextService } from './support/prompts/policy-context.service';
+import { SupportOrchestrator } from './support/orchestration/support-orchestrator.service';
 import { WorkflowService } from './workflows/workflow.service';
 import { WorkflowBootstrapService } from './workflows/workflow-bootstrap.service';
 import { WorkflowController, AgentController } from './workflows/workflow.controller';
@@ -47,6 +49,8 @@ import { StripeProvider } from './billing/stripe.provider';
     CompanyService,
     ConnectionsService,
     SupportService,
+    PolicyContextService,
+    SupportOrchestrator,
     StateService,
     MistralProvider,
     JevProvider,

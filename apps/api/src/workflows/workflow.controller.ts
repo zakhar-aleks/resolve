@@ -1,3 +1,4 @@
+import { PolicyContextService } from '../support/prompts/policy-context.service';
 import { agentApiSchema } from './domain/api-schema';
 import { Body, Controller, Get, Param, Post, Put, UseGuards, ParseUUIDPipe } from '@nestjs/common';
 import {
@@ -21,7 +22,11 @@ export class WorkflowController {
   constructor(
     protected readonly workflows: WorkflowService,
     protected readonly management: CaseManagementService,
+    protected readonly policies: PolicyContextService,
   ) {}
+  @Get('prompt') async promptPreview() {
+    return this.policies.preview(await this.policies.load());
+  }
   @Get('schema') schema() {
     return agentApiSchema();
   }
@@ -75,7 +80,11 @@ export class WorkflowController {
 @UseGuards(AgentKeyGuard)
 export class AgentController extends WorkflowController {
   protected override readonly access: WorkflowAccess = 'api';
-  constructor(workflows: WorkflowService, management: CaseManagementService) {
-    super(workflows, management);
+  constructor(
+    workflows: WorkflowService,
+    management: CaseManagementService,
+    policies: PolicyContextService,
+  ) {
+    super(workflows, management, policies);
   }
 }

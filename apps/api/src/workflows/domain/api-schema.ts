@@ -34,6 +34,9 @@ export function agentApiSchema() {
     },
     servers: [{ url: '/api/v1/agent' }],
     paths: {
+      '/prompt': {
+        get: operation('Inspect current system instructions and policy versions', undefined, true),
+      },
       '/capabilities': { get: operation('List supported actions') },
       '/schema': { get: operation('Read this API schema') },
       '/messages': {

@@ -28,7 +28,7 @@ export class AgentKeyGuard implements CanActivate {
     const token = request.headers.authorization?.replace(/^Bearer /u, '') ?? '';
     const privileged =
       request.method === 'PUT' ||
-      ['execute', 'reconcile', 'savePolicy'].includes(context.getHandler().name);
+      ['execute', 'reconcile', 'savePolicy', 'promptPreview'].includes(context.getHandler().name);
     if (
       matches(token, environment.RESOLVE_REVIEWER_KEY) ||
       (!privileged && matches(token, environment.RESOLVE_API_KEY))

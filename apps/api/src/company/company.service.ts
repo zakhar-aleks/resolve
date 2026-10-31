@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'node:crypto';
 import type { Repository } from 'typeorm';
-import type { CompanyProfile } from '@resolve/contracts';
+import { CompanySchema, type CompanyProfile } from '@resolve/contracts';
 import { CompanyEntity } from '../database/entities/company.entity';
 import { conflict } from '../common/errors';
 @Injectable()
@@ -13,7 +13,7 @@ export class CompanyService {
     @InjectRepository(CompanyEntity) private readonly companies: Repository<CompanyEntity>,
   ) {}
   async get(): Promise<CompanyProfile> {
-    return (await this.companies.findOneByOrFail({ id: 1 })).profile;
+    return CompanySchema.parse((await this.companies.findOneByOrFail({ id: 1 })).profile);
   }
   async update(input: CompanyProfile): Promise<CompanyProfile> {
     return this.companies.manager.transaction(async (manager) => {

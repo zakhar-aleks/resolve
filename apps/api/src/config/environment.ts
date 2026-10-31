@@ -8,6 +8,7 @@ const schema = z.object({
   API_PORT: z.coerce.number().int().default(8788),
   WEB_ORIGIN: z.url().default('http://127.0.0.1:8787'),
   MISTRAL_MODEL: z.string().default('mistral-small-2603'),
+  MISTRAL_LARGE_MODEL: z.string().default(''),
   MISTRAL_API_KEY: z.string().default(''),
   TYPESAFE_API_KEY: z.string().default(''),
   SLACK_APP_TOKEN: z.string().default(''),
