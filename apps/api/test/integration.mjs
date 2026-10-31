@@ -29,6 +29,11 @@ before(
         ...process.env,
         DATABASE_URL: url.href,
         API_PORT: '8798',
+        RESOLVE_API_KEY: 'integration-agent-key-000000000000000000',
+        RESOLVE_REVIEWER_KEY: 'integration-reviewer-key-000000000000000',
+        SERVICE_CONNECTOR_URL: '',
+        SERVICE_CONNECTOR_TOKEN: '',
+        SLACK_BOT_TOKEN: '',
         MISTRAL_API_KEY: '',
         SLACK_APP_TOKEN: '',
         SLACK_TEAM_ID: '',
@@ -217,6 +222,275 @@ test('retention removes expired closed conversation content and preserves billin
         .every((item) => item.message === 'Content removed under retention policy.'),
     );
     assert.ok(state.operations.find((item) => item.caseId === 'duplicate').receipt);
+  } finally {
+    await client.end();
+  }
+});
+const agentKey = 'integration-agent-key-000000000000000000';
+const reviewerKey = 'integration-reviewer-key-000000000000000';
+async function agent(path, method = 'GET', body, key = agentKey) {
+  const response = await fetch(origin + '/v1/agent' + path, {
+    method,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+  });
+  return { status: response.status, body: await response.json() };
+}
+const workflowInput = (action) => ({
+  idempotencyKey: randomUUID(),
+  mode: 'demo',
+  customerId: 'customer_demo',
+  verificationToken: 'demo-customer-verification',
+  action,
+});
+test('agent API requires keys and separates approval from intake', async () => {
+  assert.equal((await agent('/capabilities', 'GET', undefined, 'bad')).status, 401);
+  assert.equal((await agent('/capabilities')).body.kinds.length, 6);
+  assert.equal((await agent('/schema')).body.openapi, '3.1.0');
+  assert.equal((await agent('/requests/not-an-id')).status, 400);
+  const publicState = JSON.stringify((await request('/state')).body);
+  assert.equal(publicState.includes(agentKey), false);
+  assert.equal(publicState.includes(reviewerKey), false);
+  assert.equal(
+    (
+      await agent('/requests/00000000-0000-4000-8000-000000000000/execute', 'POST', {
+        planHash: 'a'.repeat(64),
+      })
+    ).status,
+    401,
+  );
+  assert.equal(
+    (
+      await agent('/requests/00000000-0000-4000-8000-000000000000/execute/', 'POST', {
+        planHash: 'a'.repeat(64),
+      })
+    ).status,
+    401,
+  );
+  const result = await agent('/messages', 'POST', {
+    name: 'Demo',
+    title: 'Address update',
+    message: 'Please change my delivery address.',
+    aiPreference: 'human_only',
+  });
+  assert.equal(result.body.suggestedAction, 'change_address');
+});
+test('all six actions persist verified demo outcomes', async () => {
+  const actions = [
+    {
+      kind: 'change_address',
+      resourceId: 'order_demo',
+      address: { line1: '20 Fictional Road', city: 'Paris', postalCode: '75001', country: 'FR' },
+    },
+    {
+      kind: 'arrange_return',
+      resourceId: 'return_order_demo',
+      itemId: 'item_demo',
+      quantity: 1,
+      resolution: 'replacement',
+      reason: 'Damaged item',
+    },
+    { kind: 'reschedule_appointment', resourceId: 'appointment_demo', slotId: 'slot_morning' },
+    { kind: 'recover_account', resourceId: 'account_demo' },
+    {
+      kind: 'update_preferences',
+      resourceId: 'customer_demo',
+      marketingEmail: false,
+      productUpdates: false,
+    },
+    { kind: 'privacy_request', resourceId: 'customer_demo', requestType: 'erasure' },
+  ];
+  for (const action of actions) {
+    const input = workflowInput(action);
+    const prepared = await agent('/requests', 'POST', input);
+    assert.equal(prepared.status, 201, JSON.stringify(prepared.body));
+    const plan = prepared.body;
+    assert.equal((await agent('/requests', 'POST', input)).body.id, plan.id);
+    assert.equal(JSON.stringify(plan).includes(input.verificationToken), false);
+    if (plan.state === 'awaiting_confirmation') {
+      assert.equal(
+        (
+          await agent(
+            `/requests/${plan.id}/execute`,
+            'POST',
+            { planHash: plan.planHash },
+            reviewerKey,
+          )
+        ).status,
+        409,
+      );
+      assert.equal(
+        (
+          await agent(`/requests/${plan.id}/confirm`, 'POST', {
+            planHash: plan.planHash,
+            verificationToken: 'wrong',
+          })
+        ).status,
+        400,
+      );
+      assert.equal(
+        (
+          await agent(`/requests/${plan.id}/confirm`, 'POST', {
+            planHash: plan.planHash,
+            verificationToken: input.verificationToken,
+          })
+        ).body.state,
+        'ready',
+      );
+    }
+    const results = await Promise.all([
+      agent(`/requests/${plan.id}/execute`, 'POST', { planHash: plan.planHash }, reviewerKey),
+      agent(`/requests/${plan.id}/execute`, 'POST', { planHash: plan.planHash }, reviewerKey),
+    ]);
+    assert.ok(
+      results.every((result) => result.status === 201 && result.body.state === 'succeeded'),
+      JSON.stringify(results),
+    );
+    assert.equal(results[0].body.receiptId, results[1].body.receiptId);
+  }
+  const state = (await agent('/demo')).body;
+  assert.equal(state.version, 7);
+  assert.equal(state.order.address.city, 'Paris');
+  assert.equal(state.returnOrder.stock, 4);
+  assert.equal(state.returnOrder.returns.length, 1);
+  assert.equal(state.appointment.slotId, 'slot_morning');
+  assert.equal(state.account.recoveryRequests.length, 1);
+  assert.equal(state.preferences.marketingEmail, false);
+  assert.equal(state.privacyRequests[0].status, 'awaiting_specialist_review');
+});
+test('workflow ownership, idempotency and changed policies fail closed', async () => {
+  const input = workflowInput({ kind: 'recover_account', resourceId: 'account_demo' });
+  const invalid = await agent('/requests', 'POST', { ...input, verificationToken: 'wrong' });
+  assert.equal(invalid.body.state, 'blocked');
+  assert.equal(
+    (
+      await agent(
+        `/requests/${invalid.body.id}/execute`,
+        'POST',
+        { planHash: invalid.body.planHash },
+        reviewerKey,
+      )
+    ).status,
+    409,
+  );
+  assert.equal((await agent('/requests', 'POST', input)).status, 409);
+  const ready = (await agent('/requests', 'POST', { ...input, idempotencyKey: randomUUID() })).body;
+  const policy = (await agent('/policy')).body;
+  assert.equal((await agent('/policy', 'PUT', { ...policy, enabledActions: [] })).status, 401);
+  assert.equal(
+    (await agent('/policy', 'PUT', { ...policy, enabledActions: [] }, reviewerKey)).status,
+    200,
+  );
+  assert.equal(
+    (
+      await agent(
+        `/requests/${ready.id}/execute`,
+        'POST',
+        { planHash: ready.planHash },
+        reviewerKey,
+      )
+    ).body.code,
+    'PLAN_CHANGED',
+  );
+  const current = (await agent('/policy')).body;
+  await agent('/policy', 'PUT', { ...current, enabledActions: policy.enabledActions }, reviewerKey);
+});
+test('connector dispatch is claimed once and unknown outcomes reconcile without another write', async () => {
+  const { DataSource } = await import('typeorm');
+  const { databaseOptions } = await import('../dist/database/data-source.js');
+  const { WorkflowService } = await import('../dist/workflows/workflow.service.js');
+  const data = new DataSource({ ...databaseOptions, url: url.href, migrationsRun: false });
+  await data.initialize();
+  const privacy = (await request('/privacy')).body;
+  await request('/privacy', 'PUT', {
+    ...privacy,
+    legalName: 'Fictional Company',
+    privacyEmail: 'privacy@example.com',
+    lawfulBasis: 'contract',
+    tasks: privacy.tasks.map((task) =>
+      ['processors', 'security', 'notice'].includes(task.id)
+        ? { ...task, owner: 'Test owner', evidence: 'Test assessment', confirmed: true }
+        : task,
+    ),
+  });
+  let writes = 0;
+  let acknowledged = false;
+  const connector = {
+    configured: () => true,
+    prepare: async () => ({
+      planRef: 'server-plan-reference',
+      summary: 'Request account recovery',
+      ownershipVerified: true,
+      resourceVersion: '1',
+      confirmationRequired: false,
+      checks: [
+        { code: 'resource_found', passed: true },
+        { code: 'recovery_rate_limit', passed: true },
+      ],
+    }),
+    execute: async () => {
+      writes++;
+      await delay(20);
+      throw new Error('Lost acknowledgement');
+    },
+    outcome: async () => {
+      if (!acknowledged) throw new Error('Unavailable');
+      return {
+        status: 'succeeded',
+        receiptId: 'provider-receipt',
+        summary: 'Recovery request accepted by the identity provider.',
+      };
+    },
+  };
+  const service = new WorkflowService(data, connector);
+  try {
+    const workflow = await service.prepare(
+      {
+        ...workflowInput({ kind: 'recover_account', resourceId: 'account_live' }),
+        mode: 'connector',
+      },
+      'api',
+    );
+    assert.equal(JSON.stringify(workflow).includes('server-plan-reference'), false);
+    await Promise.all([
+      service.execute(workflow.id, workflow.planHash, 'api'),
+      service.execute(workflow.id, workflow.planHash, 'api'),
+    ]);
+    assert.equal(writes, 1);
+    assert.equal((await service.get(workflow.id, 'api')).state, 'unknown');
+    await service.execute(workflow.id, workflow.planHash, 'api');
+    assert.equal(writes, 1);
+    acknowledged = true;
+    assert.equal((await service.reconcile(workflow.id, 'api')).state, 'succeeded');
+    assert.equal(writes, 1);
+    assert.equal(
+      (await request('/state')).body.workflows.some((item) => item.id === workflow.id),
+      false,
+    );
+  } finally {
+    await data.destroy();
+  }
+});
+test('expired workflow content is removed while idempotency identity remains', async () => {
+  const client = new pg.Client({ connectionString: url.href });
+  await client.connect();
+  try {
+    const row = (
+      await client.query(
+        `SELECT id FROM agent_workflows WHERE result->>'state'='succeeded' LIMIT 1`,
+      )
+    ).rows[0];
+    assert.ok(row);
+    await client.query(
+      `UPDATE agent_workflows SET result=jsonb_set(result,'{updatedAt}',to_jsonb('2020-01-01T00:00:00.000Z'::text)) WHERE id=$1`,
+      [row.id],
+    );
+    await request('/privacy/retention', 'POST', {});
+    const archived = (await agent(`/requests/${row.id}`)).body;
+    assert.ok(archived.archivedAt);
+    assert.equal(archived.action, null);
+    assert.equal(archived.customerId, '');
+    assert.ok(archived.receiptId);
   } finally {
     await client.end();
   }
