@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_COMPANY,
+  CaseSchema,
   type Analysis,
   type SupportCase,
   type SupportRun,
 } from '@resolve/contracts';
 import { evaluatePolicy, allowedActions, rulesDecision, approvalFailure } from './policy';
-const record: SupportCase = {
+const record: SupportCase = CaseSchema.parse({
   id: 'test',
   name: 'Jamie',
   title: 'Duplicate',
@@ -21,10 +22,11 @@ const record: SupportCase = {
   provider: 'simulator',
   paymentStatus: 'paid',
   subscriptionStatus: 'active',
-};
+});
 const analysis: Analysis = { intent: 'refund', summary: record.message, source: 'rules' };
 function run(): SupportRun {
   return {
+    privacyRevision: 'privacy-v1',
     id: crypto.randomUUID(),
     caseId: record.id,
     message: record.message,

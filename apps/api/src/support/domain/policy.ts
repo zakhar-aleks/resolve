@@ -19,7 +19,10 @@ export function evaluatePolicy(
     value: number | null = null,
   ): PolicyCheck => ({ id, passed, value });
   const common = [
-    check('ownership', record.customerId.length > 0),
+    check(
+      'ownership',
+      record.customerId.length > 0 && record.provider !== 'unlinked' && record.archivedAt === null,
+    ),
     check('authorization', !company.reviewAll),
   ];
   if (intent === 'cancel')

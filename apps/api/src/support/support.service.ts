@@ -1,3 +1,6 @@
+import { PrivacyService } from '../privacy/privacy.service';
+import { redactIdentifiers } from '../privacy/domain/redaction';
+import { suggestedTags } from './helpers/summary';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'node:crypto';
@@ -21,6 +24,7 @@ export class SupportService {
     private readonly mistral: MistralProvider,
     private readonly jev: JevProvider,
     private readonly stripe: StripeProvider,
+    private readonly privacy: PrivacyService,
   ) {}
   async create(input: CreateCaseInput): Promise<SupportCase> {
     const id = `custom_${randomUUID()}`;
@@ -43,16 +47,23 @@ export class SupportService {
     const stored = await this.cases.findOneByOrFail({ id: caseId });
     const record = stored.provider === 'stripe' ? await this.stripe.readPayment(stored) : stored;
     const company = await this.company.get();
-    const analysis = await this.mistral.analyze(message, record, company);
+    const privacy = await this.privacy.get();
+    const externalAllowed = privacy.aiEnabled && record.aiPreference !== 'human_only';
+    const effectiveCompany = externalAllowed
+      ? company
+      : { ...company, decisionEngine: 'rules' as const };
+    const modelMessage = privacy.redactBeforeAi ? redactIdentifiers(message) : message;
+    const analysis = await this.mistral.analyze(modelMessage, record, effectiveCompany);
     const checks = evaluatePolicy(record, analysis.intent, company);
     const allowed = allowedActions(analysis.intent, checks);
     const decision =
-      company.decisionEngine === 'jev'
-        ? await this.jev.judge(message, record, company, allowed)
-        : company.decisionEngine === 'auto' && this.connections.getMistralKey()
-          ? await this.mistral.judge(message, record, company, allowed)
+      effectiveCompany.decisionEngine === 'jev'
+        ? await this.jev.judge(modelMessage, record, company, allowed)
+        : effectiveCompany.decisionEngine === 'auto' && this.connections.getMistralKey()
+          ? await this.mistral.judge(modelMessage, record, company, allowed)
           : rulesDecision(record, analysis, company, allowed);
     const result: SupportRun = {
+      privacyRevision: privacy.revision,
       id: randomUUID(),
       caseId,
       message,
@@ -65,6 +76,12 @@ export class SupportService {
       createdAt: new Date().toISOString(),
     };
     await this.runs.save({ id: result.id, caseId, result, createdAt: new Date(result.createdAt) });
+    await this.cases.update(caseId, {
+      summary: analysis.summary,
+      triageStatus:
+        decision.action === 'review' || decision.action === 'request_info' ? 'review' : 'ready',
+      tags: [...new Set([...record.tags, ...suggestedTags(record, analysis.intent)])].slice(0, 8),
+    });
     return result;
   }
 }

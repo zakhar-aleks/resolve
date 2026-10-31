@@ -1,3 +1,5 @@
+import { In, IsNull } from 'typeorm';
+import { CaseEntity } from '../database/entities/case.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'node:crypto';
@@ -23,6 +25,11 @@ export class CompanyService {
       if (company.profile.revision !== input.revision) conflict('STALE_SETTINGS');
       company.profile = { ...input, revision: randomUUID() };
       await repo.save(company);
+      await manager.update(
+        CaseEntity,
+        { status: In(['open', 'waiting']), archivedAt: IsNull() },
+        { triageStatus: 'pending' },
+      );
       return company.profile;
     });
   }

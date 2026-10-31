@@ -1,3 +1,4 @@
+import { modelBillingContext } from '../helpers/summary';
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
 import type { CompanyProfile, Decision, SupportCase } from '@resolve/contracts';
@@ -31,7 +32,7 @@ export class JevProvider {
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: environment.JEV_MODEL,
-        state: { message, billing: record, company },
+        state: { message, billing: modelBillingContext(record), company },
         questions: {
           resolution: {
             type: 'choice',
