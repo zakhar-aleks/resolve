@@ -1,3 +1,5 @@
+import { HttpException } from '@nestjs/common';
+import { PolicyContextService } from './prompts/policy-context.service';
 import {
   Injectable,
   type OnApplicationBootstrap,
@@ -13,10 +15,12 @@ export class TriageService implements OnApplicationBootstrap, OnApplicationShutd
   private timer: ReturnType<typeof setInterval> | undefined;
   private busy = false;
   private lastRetention = 0;
+  private lastPromptHash = '';
   constructor(
     private readonly data: DataSource,
     private readonly support: SupportService,
     private readonly privacy: PrivacyService,
+    private readonly policies: PolicyContextService,
   ) {}
   async onApplicationBootstrap(): Promise<void> {
     await this.data
@@ -34,6 +38,17 @@ export class TriageService implements OnApplicationBootstrap, OnApplicationShutd
     if (this.busy) return;
     this.busy = true;
     try {
+      const snapshot = await this.policies.load();
+      if (this.lastPromptHash !== snapshot.metadata.snapshotHash) {
+        await this.data
+          .getRepository(CaseEntity)
+          .createQueryBuilder()
+          .update()
+          .set({ triageStatus: 'pending' })
+          .where("status IN ('open','waiting') AND \"archivedAt\" IS NULL")
+          .execute();
+        this.lastPromptHash = snapshot.metadata.snapshotHash;
+      }
       if (Date.now() - this.lastRetention > 60000) {
         await this.privacy.applyRetention();
         this.lastRetention = Date.now();
@@ -60,7 +75,17 @@ export class TriageService implements OnApplicationBootstrap, OnApplicationShutd
         }
         try {
           await this.support.analyze(record.id, record.message);
-        } catch {
+        } catch (error) {
+          if (error instanceof HttpException) {
+            const body = error.getResponse();
+            if (
+              typeof body === 'object' &&
+              body !== null &&
+              'code' in body &&
+              ['POLICY_CHANGED', 'ARCHIVED_REQUEST'].includes(String(body.code))
+            )
+              continue;
+          }
           await this.data.getRepository(CaseEntity).update(record.id, {
             summary: localSummary(record, 'investigate'),
             triageStatus: 'review',
