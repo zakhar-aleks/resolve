@@ -20,6 +20,9 @@ export const FEEDBACK_COPY = {
     caseCreated: 'Test request created.',
   },
   errors: {
+    PRIVACY_SETUP_REQUIRED:
+      'Complete your legal identity, privacy contact, lawful-basis assessment, and processor review before enabling external AI.',
+    ARCHIVED_REQUEST: 'This request has been archived under your retention policy.',
     VALIDATION_FAILED: 'Check the form values and try again.',
     STALE_SETTINGS: 'Settings changed in another window. Reload before saving.',
     POLICY_CHANGED: 'Company policy changed. Analyze the case again before executing.',
