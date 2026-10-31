@@ -1,0 +1,42 @@
+---
+import { COPY } from '../consts/copy';
+import { VIEWS, type View } from '../consts/routes';
+import { fragmentUrl, workspaceUrl } from '../helpers/routes';
+import { initials } from '../utils/format';
+interface Props {
+  companyName: string;
+  view: View;
+}
+const { companyName, view } = Astro.props;
+---
+
+<aside class="sidebar">
+  <a href="/" class="brand">{COPY.product}<span>{COPY.productMark}</span></a>
+  <div class="sidebar-company">
+    <span class="company-avatar">{initials(companyName)}</span><div>
+      <b>{companyName}</b><small>{COPY.shell.supportWorkspace}</small>
+    </div>
+  </div>
+  <p class="eyebrow nav-caption">{COPY.shell.workspace}</p>
+  <nav>
+    {
+      VIEWS.map((item) => (
+        <a
+          class:list={['nav-link', { 'is-active': view === item }]}
+          href={workspaceUrl(item)}
+          hx-get={fragmentUrl(item)}
+          hx-target="#workspace"
+          hx-swap="innerHTML"
+          hx-push-url={workspaceUrl(item)}
+          aria-current={view === item ? 'page' : undefined}
+        >
+          <span>{COPY.symbols[item]}</span>
+          {COPY.nav[item]}
+        </a>
+      ))
+    }
+  </nav>
+  <div class="sidebar-bottom">
+    <span class="status-dot"></span>{COPY.shell.local}<small>{COPY.shell.localDetail}</small>
+  </div>
+</aside>

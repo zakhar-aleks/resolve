@@ -1,0 +1,45 @@
+---
+import type { WorkspaceModel } from '../types/workspace';
+import { COPY } from '../consts/copy';
+import Sidebar from './Sidebar.astro';
+import SupportInbox from './SupportInbox.astro';
+import CompanySettings from './CompanySettings.astro';
+import Connections from './Connections.astro';
+interface Props {
+  model: WorkspaceModel;
+}
+const { model } = Astro.props;
+---
+
+<Sidebar companyName={model.state.company.companyName} view={model.view} />
+<div class="workspace-shell">
+  <header class="topbar">
+    <div class="breadcrumb">
+      <span>{model.state.company.companyName}</span><span>{COPY.symbols.slash}</span><b
+        >{COPY.nav[model.view]}</b
+      >
+    </div><span class="header-status"
+      >{COPY.shell.headerStatus}<span class="avatar">{COPY.shell.operator}</span></span
+    >
+  </header>
+  <main>
+    {
+      model.notice && (
+        <div
+          class:list={['notice', { 'is-error': model.notice.kind === 'error' }]}
+          role={model.notice.kind === 'error' ? 'alert' : 'status'}
+        >
+          {model.notice.message}
+        </div>
+      )
+    }{
+      model.view === 'support' ? (
+        <SupportInbox model={model} />
+      ) : model.view === 'company' ? (
+        <CompanySettings company={model.state.company} />
+      ) : (
+        <Connections connections={model.state.connections} />
+      )
+    }<footer><span>{COPY.shell.footer}</span><span>{COPY.shell.footerDetail}</span></footer>
+  </main>
+</div>

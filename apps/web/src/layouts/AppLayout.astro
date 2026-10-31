@@ -1,0 +1,26 @@
+---
+import '../styles/app.css';
+import { COPY } from '../consts/copy';
+---
+
+<!doctype html>
+<html lang={COPY.language}>
+  <head
+    ><meta charset="utf-8" /><meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    /><meta name="description" content={COPY.support.description} /><meta
+      name="htmx-config"
+      content='{"includeIndicatorStyles":false,"allowEval":false,"historyCacheSize":0}'
+    /><title>{COPY.title}</title></head
+  ><body hx-history="false"
+    ><div id="workspace"><slot /></div><div
+      id="request-indicator"
+      class="request-indicator"
+      aria-hidden="true"
+    >
+    </div><div id="network-error" class="network-error" role="alert" hidden></div><script>
+      import '../scripts/client';
+    </script></body
+  >
+</html>
