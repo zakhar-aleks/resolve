@@ -1,0 +1,53 @@
+export const CONNECTIONS_COPY = {
+  connections: {
+    eyebrow: 'WORKSPACE / CONNECTIONS',
+    title: 'Connect what you need.',
+    description: 'Start with rules. Add Mistral for language and judgment. Jev is optional.',
+    serverKeys: 'SERVER-SIDE KEYS',
+    mistral: 'Mistral',
+    mistralDescription: 'Small 4 · understanding and policy judgment',
+    keyGuidance:
+      'Mistral shows the full secret only once, in the creation dialog. If you missed it, create a new key. A masked table value cannot recover it.',
+    mistralKey: 'Mistral API key',
+    connect: 'Connect key ↗',
+    test: 'Test access',
+    memoryNote:
+      'Keys entered here live only in the NestJS server’s memory until restart. They are never returned to the browser or saved to browser storage. Use .env for persistence.',
+    console: 'Open Mistral console ↗',
+    jev: 'Jev',
+    jevDescription: 'Optional specialized decision model',
+    jevBody:
+      'No Jev credits? Leave this disconnected. Automatic mode uses Mistral when connected. Rules mode needs neither provider.',
+    jevKey: 'TypeSafe API key',
+    connectJev: 'Connect Jev',
+    jevNote: 'Connect a key, then select Jev in Company & policies to enable it.',
+    configured: 'Key configured',
+    notConnected: 'Not connected',
+    optional: 'Optional',
+    billing: 'Billing',
+    billingDescription: 'Simulated payments + optional Stripe test adapter',
+    testOnly: 'TEST ONLY',
+    billingBody:
+      'Simulator actions update PostgreSQL records. Configure an existing Stripe test customer and payment in .env to enable test refunds.',
+    billingNote:
+      'Restart after editing .env. Live Stripe keys are rejected. This local operator workspace has no production customer authentication.',
+    stackEyebrow: 'UNDER THE HOOD',
+    stackTitle: 'Typed boundaries. Visible decisions.',
+    frontend: 'Frontend',
+    frontendValue: 'Astro · HTMX · Tailwind · TypeScript',
+    backend: 'Backend',
+    backendValue: 'Node.js · NestJS',
+    database: 'Database',
+    databaseValue: 'PostgreSQL · TypeORM',
+    contracts: 'Contracts',
+    contractsValue: 'Shared Zod schemas',
+    model: 'Default model',
+    modelValue: 'Mistral Small 4',
+  },
+  sources: { rules: 'Policy rules · no model credits', mistral: 'Mistral Small 4', jev: 'Jev' },
+  unavailable: {
+    title: 'Workspace unavailable',
+    body: 'Start PostgreSQL and NestJS to load the workspace. The frontend will not substitute simulated storage.',
+    retry: 'Retry connection',
+  },
+} as const;

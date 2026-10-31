@@ -1,0 +1,48 @@
+export const FEEDBACK_COPY = {
+  placeholders: {
+    company: 'Acme',
+    agent: 'Resolve',
+    email: 'support@company.com',
+    context: 'Describe your product, customers, and support expectations.',
+    policy:
+      'Example: Refund duplicate payments to the original payment method. Annual contracts require specialist review. Never offer store credit without customer consent.',
+    key: 'Paste the full key from its creation dialog',
+    optionalKey: 'Optional',
+    customer: 'Jamie Smith',
+    subject: 'Subscription refund',
+    message: 'Describe the customer’s request.',
+  },
+  notices: {
+    companySaved: 'Settings saved. A new company policy version is active.',
+    keySaved: 'Key configured in server memory. Test access before running a request.',
+    keyAccepted: 'Mistral accepted the key and lists the configured model.',
+    modelUnavailable: 'Key accepted, but the configured model is not listed. Check model access.',
+    caseCreated: 'Test request created.',
+  },
+  errors: {
+    VALIDATION_FAILED: 'Check the form values and try again.',
+    STALE_SETTINGS: 'Settings changed in another window. Reload before saving.',
+    POLICY_CHANGED: 'Company policy changed. Analyze the case again before executing.',
+    DECISION_EXPIRED: 'This decision expired. Analyze the case again.',
+    ACTION_NOT_AUTHORIZED: 'This decision does not authorize a billing action.',
+    BILLING_STATE_CHANGED: 'Billing state changed. Analyze the case again.',
+    AMOUNT_CHANGED: 'The refundable amount changed. Analyze again.',
+    UNRESOLVED_OPERATION: 'An operation is unresolved. Reconcile it before another action.',
+    JEV_KEY_REQUIRED:
+      'Jev needs a key and credits. Select Automatic or Rules to continue without it.',
+    MISTRAL_KEY_REQUIRED: 'Connect a full Mistral key first.',
+    MISTRAL_KEY_REJECTED:
+      'Mistral rejected the key. Copy the full secret from its creation dialog.',
+    PROVIDER_UNAVAILABLE: 'The configured provider is unavailable. No new action was authorized.',
+    INVALID_MODEL_RESPONSE: 'The model returned an invalid decision. No action was authorized.',
+    STRIPE_TEST_KEY_REQUIRED: 'Stripe requires a test-mode secret key.',
+    PAYMENT_OWNERSHIP_FAILED: 'The test payment does not belong to the configured customer.',
+    UNSUPPORTED_CURRENCY: 'This MVP supports USD payments.',
+    NOT_FOUND: 'The requested record was not found.',
+    INTERNAL_ERROR: 'The request could not be completed. Check the backend logs.',
+    API_UNAVAILABLE: 'NestJS is not reachable. Start PostgreSQL and run npm run dev.',
+    UNKNOWN: 'The request could not be completed.',
+    POLICY_FILE: 'Choose a .txt or .md policy under 50 KB and 10,000 characters.',
+    NETWORK: 'The connection failed. Please try again.',
+  },
+} as const;
