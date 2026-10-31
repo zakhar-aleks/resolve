@@ -1,0 +1,16 @@
+display_information:
+  name: Resolve
+  description: Bring support requests into your team inbox
+features:
+  bot_user:
+    display_name: Resolve
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+settings:
+  event_subscriptions:
+    bot_events:
+      - app_mention
+  socket_mode_enabled: true
