@@ -1,1 +1,27 @@
-{"name":"@resolve/web","version":"0.2.0","private":true,"type":"module","scripts":{"dev":"astro dev --host 127.0.0.1 --port 8787","build":"astro check && astro build","check":"astro check","start":"node dist/server/entry.mjs"},"dependencies":{"@resolve/contracts":"0.2.0","astro":"7.4.4","@astrojs/node":"11.1.9","@tailwindcss/vite":"4.3.3","tailwindcss":"4.3.3","htmx.org":"2.0.11","zod":"^4.1.12"},"devDependencies":{"@astrojs/check":"^0.9.5","typescript":"5.9.3"}}
+{
+  "name": "@resolve/web",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "ASTRO_TELEMETRY_DISABLED=1 astro dev --host 127.0.0.1 --port 8787",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro check && ASTRO_TELEMETRY_DISABLED=1 astro build",
+    "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+    "start": "node dist/server/entry.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@resolve/contracts": "0.2.0",
+    "astro": "7.4.4",
+    "@astrojs/node": "11.1.9",
+    "@tailwindcss/vite": "4.3.3",
+    "tailwindcss": "4.3.3",
+    "htmx.org": "2.0.11",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.5",
+    "typescript": "5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
