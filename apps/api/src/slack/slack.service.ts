@@ -1,3 +1,4 @@
+import { workflowIntent } from '../workflows/domain/intent';
 import {
   Injectable,
   type OnApplicationBootstrap,
@@ -68,14 +69,55 @@ export class SlackService implements OnApplicationBootstrap, OnApplicationShutdo
   }
   private async receive(payload: unknown): Promise<void> {
     const envelope = envelopeSchema.parse(payload);
-    await this.ingest(envelope.body);
+    const request = parseMention(
+      envelope.body,
+      environment.SLACK_TEAM_ID,
+      environment.SLACK_CHANNEL_IDS,
+    );
+    const result = await this.store(envelope.body);
     await envelope.ack();
+    if (result?.created && request && environment.SLACK_BOT_TOKEN) {
+      const body = z
+        .object({ event: z.object({ channel: z.string(), ts: z.string() }) })
+        .parse(envelope.body);
+      const kind = workflowIntent(request.message);
+      const labels = {
+        change_address: 'delivery address change',
+        arrange_return: 'return or replacement',
+        reschedule_appointment: 'appointment change',
+        recover_account: 'account recovery',
+        update_preferences: 'notification preferences',
+        privacy_request: 'privacy request',
+      } as const;
+      const text = `Your request is in the support inbox.${kind ? ` Suggested workflow: ${labels[kind]}.` : ''} A team member will verify the details before any change. ${environment.WEB_ORIGIN}/?view=support&case=${encodeURIComponent(result.id)}`;
+      const response = await fetch('https://slack.com/api/chat.postMessage', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${environment.SLACK_BOT_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          channel: body.event.channel,
+          thread_ts: body.event.ts,
+          text,
+          unfurl_links: false,
+          unfurl_media: false,
+        }),
+        signal: AbortSignal.timeout(8000),
+        redirect: 'error',
+      });
+      const value: unknown = await response.json();
+      if (!z.object({ ok: z.literal(true) }).safeParse(value).success) this.failed = true;
+    }
   }
   async ingest(payload: unknown): Promise<string | null> {
+    return (await this.store(payload))?.id ?? null;
+  }
+  private async store(payload: unknown): Promise<{ id: string; created: boolean } | null> {
     const request = parseMention(payload, environment.SLACK_TEAM_ID, environment.SLACK_CHANNEL_IDS);
     if (!request) return null;
     const { id, message, aiPreference } = request;
-    await this.data
+    const inserted = await this.data
       .createQueryBuilder()
       .insert()
       .into(CaseEntity)
@@ -97,11 +139,13 @@ export class SlackService implements OnApplicationBootstrap, OnApplicationShutdo
         channel: 'slack',
         externalId: id,
         aiPreference,
-        tags: ['Slack'],
+        tags: ['Slack', ...(workflowIntent(message) ? ['Action requested'] : [])],
         triageStatus: 'pending',
       })
       .orIgnore()
+      .returning('id')
       .execute();
-    return id;
+    const rows: unknown = inserted.raw;
+    return { id, created: z.array(z.object({ id: z.string() })).parse(rows).length > 0 };
   }
 }
