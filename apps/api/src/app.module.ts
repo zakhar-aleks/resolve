@@ -1,0 +1,42 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { databaseOptions } from './database/data-source';
+import { BootstrapService } from './database/bootstrap.service';
+import { CompanyController } from './company/company.controller';
+import { CompanyService } from './company/company.service';
+import { ConnectionsController } from './connections/connections.controller';
+import { ConnectionsService } from './connections/connections.service';
+import { SupportController } from './support/support.controller';
+import { SupportService } from './support/support.service';
+import { StateController } from './support/state.controller';
+import { StateService } from './support/state.service';
+import { MistralProvider } from './support/providers/mistral.provider';
+import { JevProvider } from './support/providers/jev.provider';
+import { BillingController } from './billing/billing.controller';
+import { BillingService } from './billing/billing.service';
+import { StripeProvider } from './billing/stripe.provider';
+@Module({
+  imports: [
+    TypeOrmModule.forRoot(databaseOptions),
+    TypeOrmModule.forFeature(databaseOptions.entities),
+  ],
+  controllers: [
+    CompanyController,
+    ConnectionsController,
+    SupportController,
+    StateController,
+    BillingController,
+  ],
+  providers: [
+    BootstrapService,
+    CompanyService,
+    ConnectionsService,
+    SupportService,
+    StateService,
+    MistralProvider,
+    JevProvider,
+    BillingService,
+    StripeProvider,
+  ],
+})
+export class AppModule {}
