@@ -1,3 +1,4 @@
+import { PromptMetadataSchema, PromptPreviewSchema, RoutingSchema } from './prompts';
 import {
   WorkflowKindSchema,
   WorkflowListSchema,
@@ -10,6 +11,7 @@ import { z } from 'zod';
 export const ACTIONS = ['refund', 'cancel', 'review', 'request_info'] as const;
 export const ActionSchema = z.enum(ACTIONS);
 export const CompanyInputSchema = z.strictObject({
+  routingMode: z.enum(['small_only', 'adaptive']).default('small_only'),
   companyName: z.string().trim().min(1).max(80),
   agentName: z.string().trim().min(1).max(60),
   tone: z.enum(['warm', 'direct', 'friendly', 'formal']),
@@ -98,6 +100,8 @@ export const DecisionSchema = z.object({
 });
 export type Decision = z.infer<typeof DecisionSchema>;
 export const RunSchema = z.object({
+  prompt: PromptMetadataSchema.optional(),
+  routing: RoutingSchema.optional(),
   privacyRevision: z.string().default('legacy'),
   id: z.uuid(),
   caseId: z.string(),
@@ -226,6 +230,7 @@ export const CaseUpdateSchema = z.strictObject({
 });
 export type CaseUpdateInput = z.infer<typeof CaseUpdateSchema>;
 export const StateSchema = z.object({
+  promptPreview: PromptPreviewSchema.optional(),
   workflows: WorkflowListSchema.default([]),
   workflowPolicy: WorkflowPolicySchema.default(DEFAULT_WORKFLOW_POLICY),
   demoService: DemoStateSchema.optional(),
@@ -254,6 +259,7 @@ export const ConnectionTestSchema = z.object({ ok: z.boolean(), modelAvailable: 
 export const IdSchema = z.uuid();
 export const ErrorSchema = z.object({ code: z.string(), message: z.string() });
 export const DEFAULT_COMPANY: CompanyProfile = {
+  routingMode: 'small_only',
   companyName: 'Acme',
   agentName: 'Resolve',
   tone: 'warm',
@@ -287,3 +293,5 @@ export const IntakeSchema = z.strictObject({
 export type IntakeInput = z.infer<typeof IntakeSchema>;
 export const IntakeReceiptSchema = z.object({ reference: z.string() });
 export * from './workflows';
+
+export * from './prompts';
