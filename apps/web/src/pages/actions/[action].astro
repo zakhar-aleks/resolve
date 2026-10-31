@@ -1,0 +1,31 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+import { workspaceUrl } from '../../helpers/routes';
+import Workspace from '../../components/Workspace.astro';
+import Unavailable from '../../components/Unavailable.astro';
+import { handleAction } from '../../services/actions';
+import type { WorkspaceModel } from '../../types/workspace';
+if (Astro.request.method !== 'POST') return Astro.redirect('/');
+let model: WorkspaceModel | null = null;
+try {
+  model = await handleAction(Astro.params.action ?? '', await Astro.request.formData());
+} catch {
+  Astro.response.status = 503;
+}
+Astro.response.headers.set('Cache-Control', 'no-store');
+const htmx = Astro.request.headers.get('HX-Request') === 'true';
+if (htmx && model)
+  Astro.response.headers.set('HX-Push-Url', workspaceUrl(model.view, model.record?.id));
+---
+
+{
+  htmx ? (
+    model ? (
+      <Workspace model={model} />
+    ) : (
+      <Unavailable />
+    )
+  ) : (
+    <AppLayout>{model ? <Workspace model={model} /> : <Unavailable />}</AppLayout>
+  )
+}

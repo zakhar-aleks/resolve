@@ -1,0 +1,21 @@
+---
+import Workspace from '../../components/Workspace.astro';
+import Unavailable from '../../components/Unavailable.astro';
+import { supportApi } from '../../services/support-api';
+import { workspaceModel, parseView } from '../../services/workspace';
+import type { WorkspaceModel } from '../../types/workspace';
+let model: WorkspaceModel | null = null;
+try {
+  model = workspaceModel(await supportApi.state(), {
+    view: parseView(Astro.url.searchParams.get('view')),
+    ...(Astro.url.searchParams.get('case')
+      ? { caseId: Astro.url.searchParams.get('case') ?? '' }
+      : {}),
+  });
+} catch {
+  Astro.response.status = 503;
+}
+Astro.response.headers.set('Cache-Control', 'no-store');
+---
+
+{model ? <Workspace model={model} /> : <Unavailable />}
