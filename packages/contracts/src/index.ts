@@ -32,12 +32,24 @@ export const CreateCaseSchema = z.strictObject({
 });
 export type CreateCaseInput = z.infer<typeof CreateCaseSchema>;
 export const CaseSchema = CreateCaseSchema.extend({
+  amountCents: z.number().int().min(0).max(10000000),
+  summary: z.string().default(''),
+  triageStatus: z.enum(['pending', 'processing', 'ready', 'review']).default('pending'),
+  tags: z.array(z.string().max(32)).max(8).default([]),
+  assignee: z.string().max(80).default(''),
+  channel: z.enum(['workspace', 'slack']).default('workspace'),
+  externalId: z.string().nullable().default(null),
+  aiPreference: z.enum(['allowed', 'human_only']).default('allowed'),
+  receivedAt: z.iso.datetime().default(() => new Date().toISOString()),
+  closedAt: z.iso.datetime().nullable().default(null),
+  archivedAt: z.iso.datetime().nullable().default(null),
+  status: z.enum(['open', 'waiting', 'resolved']).default('open'),
   id: z.string(),
   customerId: z.string(),
   paymentId: z.string(),
   refundedCents: z.number().int().min(0),
   currency: z.literal('usd'),
-  provider: z.enum(['simulator', 'stripe']),
+  provider: z.enum(['simulator', 'stripe', 'unlinked']),
   paymentStatus: z.string(),
   subscriptionStatus: z.enum(['active', 'cancel_at_period_end']),
 });
@@ -78,6 +90,7 @@ export const DecisionSchema = z.object({
 });
 export type Decision = z.infer<typeof DecisionSchema>;
 export const RunSchema = z.object({
+  privacyRevision: z.string().default('legacy'),
   id: z.uuid(),
   caseId: z.string(),
   message: z.string(),
@@ -138,6 +151,72 @@ export const ConnectionStatusSchema = z.object({
   stripe: z.boolean(),
   model: z.string(),
 });
+export const PRIVACY_TASK_IDS = [
+  'scope',
+  'lawful_basis',
+  'notice',
+  'processors',
+  'transfers',
+  'security',
+  'retention',
+  'rights',
+  'incidents',
+  'impact_assessment',
+] as const;
+export const PrivacyTaskSchema = z
+  .strictObject({
+    id: z.enum(PRIVACY_TASK_IDS),
+    owner: z.string().max(100),
+    evidence: z.string().max(1500),
+    confirmed: z.boolean(),
+  })
+  .refine((task) => !task.confirmed || Boolean(task.owner.trim() && task.evidence.trim()));
+export const PrivacyProfileSchema = z.strictObject({
+  legalName: z.string().max(180),
+  address: z.string().max(500),
+  privacyEmail: z.union([z.email(), z.literal('')]),
+  businessRegion: z.enum(['eea', 'international']),
+  lawfulBasis: z.enum(['contract', 'legitimate_interests', 'consent', 'undecided']),
+  hostingLocation: z.string().max(250),
+  retentionDays: z.number().int().min(7).max(365),
+  aiEnabled: z.boolean(),
+  redactBeforeAi: z.boolean(),
+  revision: z.string().min(1),
+  tasks: z
+    .array(PrivacyTaskSchema)
+    .length(PRIVACY_TASK_IDS.length)
+    .refine((tasks) => new Set(tasks.map((task) => task.id)).size === PRIVACY_TASK_IDS.length),
+});
+export type PrivacyProfile = z.infer<typeof PrivacyProfileSchema>;
+export const DEFAULT_PRIVACY: PrivacyProfile = {
+  legalName: '',
+  address: '',
+  privacyEmail: '',
+  businessRegion: 'eea',
+  lawfulBasis: 'undecided',
+  hostingLocation: '',
+  retentionDays: 30,
+  aiEnabled: false,
+  redactBeforeAi: true,
+  revision: 'privacy-v1',
+  tasks: PRIVACY_TASK_IDS.map((id) => ({ id, owner: '', evidence: '', confirmed: false })),
+};
+export const CaseUpdateSchema = z.strictObject({
+  tags: z
+    .array(
+      z
+        .string()
+        .trim()
+        .min(1)
+        .max(32)
+        .regex(/^[\p{L}\p{N} _-]+$/u),
+    )
+    .max(8),
+  assignee: z.string().trim().max(80),
+  status: z.enum(['open', 'waiting', 'resolved']),
+  aiPreference: z.enum(['allowed', 'human_only']),
+});
+export type CaseUpdateInput = z.infer<typeof CaseUpdateSchema>;
 export const StateSchema = z.object({
   company: CompanySchema,
   cases: z.array(CaseSchema),
@@ -145,6 +224,8 @@ export const StateSchema = z.object({
   operations: z.array(OperationSchema),
   events: z.array(EventSchema),
   connections: ConnectionStatusSchema,
+  privacy: PrivacyProfileSchema,
+  slack: z.object({ configured: z.boolean(), connected: z.boolean(), lastError: z.boolean() }),
 });
 export type AppState = z.infer<typeof StateSchema>;
 export const AnalyzeSchema = z.strictObject({ message: z.string().trim().min(1).max(4000) });
@@ -178,3 +259,19 @@ export const DEFAULT_COMPANY: CompanyProfile = {
   jevConfidenceThreshold: 0.8,
   revision: 'billing-v1',
 };
+export const PublicPrivacySchema = PrivacyProfileSchema.omit({
+  tasks: true,
+  revision: true,
+}).strip();
+export const PrivacyNoticeSchema = z.object({
+  companyName: z.string(),
+  profile: PublicPrivacySchema,
+});
+export const IntakeSchema = z.strictObject({
+  name: z.string().trim().min(1).max(80),
+  title: z.string().trim().min(1).max(120),
+  message: z.string().trim().min(1).max(4000),
+  aiPreference: z.enum(['allowed', 'human_only']),
+});
+export type IntakeInput = z.infer<typeof IntakeSchema>;
+export const IntakeReceiptSchema = z.object({ reference: z.string() });
