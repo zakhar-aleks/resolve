@@ -73,10 +73,11 @@
     @apply hidden;
   }
   .sidebar nav {
-    @apply flex;
+    @apply flex gap-1.5 overflow-x-auto pb-1;
+    scrollbar-width: thin;
   }
   .nav-link {
-    @apply flex-1 justify-center gap-1.5 px-1.5 py-2 text-[10px];
+    @apply min-h-11 shrink-0 justify-center gap-2 whitespace-nowrap px-3 py-2 text-xs;
   }
   .nav-link span {
     @apply w-auto text-xs;
@@ -148,5 +149,11 @@
   }
   .settings-grid {
     @apply gap-5;
+  }
+}
+
+@media (max-width: 520px) {
+  .form-grid {
+    @apply grid-cols-1;
   }
 }

@@ -1,3 +1,4 @@
+import { revealActiveNavigation } from '../helpers/navigation';
 import { importPolicy } from '../helpers/policy-import';
 import { copyText } from '../helpers/copy';
 import htmx from 'htmx.org';
@@ -5,6 +6,7 @@ import { COPY } from '../consts/copy';
 htmx.config.allowEval = false;
 htmx.config.selfRequestsOnly = true;
 htmx.config.historyCacheSize = 0;
+revealActiveNavigation();
 document.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const dialog = document.querySelector<HTMLDialogElement>('#case-dialog');
@@ -22,6 +24,7 @@ document.addEventListener('change', (event) => {
     void importPolicy(event.target);
 });
 document.addEventListener('htmx:afterSwap', () => {
+  revealActiveNavigation();
   document.querySelector<HTMLDialogElement>('#case-dialog')?.close();
 });
 document.addEventListener('htmx:sendError', () => {
