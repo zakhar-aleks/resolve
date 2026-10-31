@@ -1,0 +1,27 @@
+name: Deployment image
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build deployment image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          tags: resolve:${{ github.sha }}
+          outputs: type=docker,dest=/tmp/resolve-image.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - run: gzip /tmp/resolve-image.tar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: resolve-deployment-image
+          path: /tmp/resolve-image.tar.gz
+          compression-level: 0
+          retention-days: 2
