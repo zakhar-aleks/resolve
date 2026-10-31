@@ -1,0 +1,7 @@
+node_modules
+**/dist
+**/.astro
+.runtime
+package-lock.json
+*.png
+*.sqlite3*
