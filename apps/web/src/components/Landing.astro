@@ -1,0 +1,93 @@
+---
+import { initials } from '../utils/format';
+import { COPY } from '../consts/copy';
+import PublicHeader from './PublicHeader.astro';
+import PublicFooter from './PublicFooter.astro';
+const text = COPY.product;
+---
+
+<div class="public-site">
+  <PublicHeader /><main class="landing-main">
+    <section class="landing-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">{text.eyebrow}</p><h1>{text.headline}</h1><p class="hero-description">
+          {text.description}
+        </p><div class="hero-actions">
+          <a href="/?view=support" class="button-primary">{text.open}</a><a
+            href="#how-it-works"
+            class="button-secondary">{text.learn}</a
+          >
+        </div><ul class="trust-list">
+          {
+            text.trust.map((item) => (
+              <li>
+                <span>{COPY.symbols.pass}</span>
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div class="hero-preview">
+        <div class="preview-top">
+          <span class="status-dot"></span><p>{text.previewLabel}</p><span class="badge"
+            >{text.previewState}</span
+          >
+        </div><div class="preview-customer">
+          <span class="avatar">{initials(text.previewName)}</span><div>
+            <b>{text.previewName}</b><span>{text.previewTag}</span>
+          </div>
+        </div><h2>{text.previewSubject}</h2><p>{text.previewSummary}</p><div
+          class="preview-guidance"
+        >
+          <span>{COPY.symbols.pass}</span><p>{text.trust[1]}</p>
+        </div><div class="preview-action">{text.previewAction}<span>{COPY.productMark}</span></div>
+      </div>
+    </section>
+    <section id="how-it-works" class="landing-section">
+      <div class="section-intro">
+        <p class="eyebrow">{text.eyebrow}</p><h2>{text.howTitle}</h2><p>{text.howDescription}</p>
+      </div><div class="steps-grid">
+        {
+          text.steps.map((step, index) => (
+            <article>
+              <>
+                <span class="step-number">{String(index + 1).padStart(2, '0')}</span>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+    <section class="landing-split">
+      <div>
+        <p class="eyebrow">{COPY.privacy.eyebrow}</p><h2>{text.privacyTitle}</h2><p>
+          {text.privacyBody}
+        </p><a href="/?view=privacy" class="text-link">{text.privacyLink}</a>
+      </div><div class="privacy-promise">
+        {
+          text.principles.map((item) => (
+            <p>
+              <span>{COPY.symbols.pass}</span>
+              {item}
+            </p>
+          ))
+        }
+      </div>
+    </section>
+    <section class="landing-slack">
+      <div><h2>{text.slackTitle}</h2><p>{text.slackBody}</p></div><a
+        href="/?view=connections"
+        class="button-secondary">{COPY.nav.connections}</a
+      >
+    </section>
+    <section class="landing-final">
+      <h2>{text.finalTitle}</h2><p>{text.finalBody}</p><a
+        href="/?view=support"
+        class="button-primary">{text.open}</a
+      >
+    </section>
+  </main><PublicFooter />
+</div>

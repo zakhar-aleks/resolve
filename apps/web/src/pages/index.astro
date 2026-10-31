@@ -1,4 +1,5 @@
 ---
+import Landing from '../components/Landing.astro';
 import AppLayout from '../layouts/AppLayout.astro';
 import Workspace from '../components/Workspace.astro';
 import Unavailable from '../components/Unavailable.astro';
@@ -6,17 +7,21 @@ import { supportApi } from '../services/support-api';
 import { workspaceModel, parseView } from '../services/workspace';
 import type { WorkspaceModel } from '../types/workspace';
 let model: WorkspaceModel | null = null;
+const landing = !Astro.url.searchParams.has('view');
 try {
-  model = workspaceModel(await supportApi.state(), {
-    view: parseView(Astro.url.searchParams.get('view')),
-    ...(Astro.url.searchParams.get('case')
-      ? { caseId: Astro.url.searchParams.get('case') ?? '' }
-      : {}),
-  });
+  if (!landing)
+    model = workspaceModel(await supportApi.state(), {
+      view: parseView(Astro.url.searchParams.get('view')),
+      ...(Astro.url.searchParams.get('case')
+        ? { caseId: Astro.url.searchParams.get('case') ?? '' }
+        : {}),
+    });
 } catch {
   Astro.response.status = 503;
 }
 Astro.response.headers.set('Cache-Control', 'no-store');
 ---
 
-<AppLayout>{model ? <Workspace model={model} /> : <Unavailable />}</AppLayout>
+<AppLayout
+  >{landing ? <Landing /> : model ? <Workspace model={model} /> : <Unavailable />}</AppLayout
+>
