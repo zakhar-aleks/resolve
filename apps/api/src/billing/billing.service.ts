@@ -1,3 +1,4 @@
+import { PolicyContextService } from '../support/prompts/policy-context.service';
 import { serializeOperation } from './mappers/operation.mapper';
 import { receiptState } from './domain/receipt-state';
 import { PrivacyEntity } from '../database/entities/privacy.entity';
@@ -25,6 +26,7 @@ export class BillingService {
   constructor(
     private readonly data: DataSource,
     private readonly stripe: StripeProvider,
+    private readonly policies: PolicyContextService,
   ) {}
   private async event(
     manager: EntityManager,
@@ -45,6 +47,7 @@ export class BillingService {
   ): Promise<{ operation: BillingOperation; dispatch: boolean }> {
     return this.data.transaction(async (manager) => {
       const run = await manager.findOneByOrFail(RunEntity, { id: runId });
+      const snapshot = await this.policies.within(manager);
       const company = await manager.findOneOrFail(CompanyEntity, {
         where: { id: 1 },
         lock: { mode: 'pessimistic_read' },
@@ -60,6 +63,9 @@ export class BillingService {
       const previous = await manager.findOneBy(OperationEntity, { runId });
       if (previous) return { operation: serializeOperation(previous), dispatch: false };
       const record = remote ?? locked;
+      if (locked.triageStatus !== 'ready') conflict('POLICY_CHANGED');
+      if (run.result.prompt?.snapshotHash !== snapshot.metadata.snapshotHash)
+        conflict('POLICY_CHANGED');
       if (run.result.privacyRevision !== privacy.profile.revision) conflict('POLICY_CHANGED');
       if (locked.aiPreference === 'human_only' && run.result.analysis.source !== 'rules')
         conflict('POLICY_CHANGED');

@@ -1,3 +1,6 @@
+import { PolicyContextService } from '../support/prompts/policy-context.service';
+import { CaseEntity } from '../database/entities/case.entity';
+import { In, IsNull } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
 import { createHash, randomUUID } from 'node:crypto';
@@ -33,6 +36,7 @@ export class WorkflowService {
   constructor(
     private readonly data: DataSource,
     private readonly connector: ConnectorProvider,
+    private readonly policies: PolicyContextService,
   ) {}
   async capabilities() {
     return {
@@ -48,9 +52,15 @@ export class WorkflowService {
   async savePolicy(input: WorkflowPolicy, access: WorkflowAccess): Promise<WorkflowPolicy> {
     if (access === 'demo' && this.connector.configured()) invalid('LIVE_API_ONLY');
     return this.data.transaction(async (manager) => {
+      await this.policies.within(manager, true);
       const row = await this.lockSettings(manager);
       if (row.policy.revision !== input.revision) conflict('STALE_SETTINGS');
       row.policy = { ...input, revision: randomUUID() };
+      await manager.update(
+        CaseEntity,
+        { status: In(['open', 'waiting']), archivedAt: IsNull() },
+        { triageStatus: 'pending' },
+      );
       await manager.save(row);
       return row.policy;
     });
@@ -81,6 +91,7 @@ export class WorkflowService {
   async prepare(input: WorkflowCreate, access: WorkflowAccess): Promise<Workflow> {
     if (access === 'demo' && input.mode !== 'demo') invalid('LIVE_API_ONLY');
     return this.data.transaction(async (manager) => {
+      const snapshot = await this.policies.within(manager, true);
       const settings = await this.lockSettings(manager);
       const existing = await manager.findOneBy(WorkflowEntity, {
         idempotencyKey: input.idempotencyKey,
@@ -142,6 +153,7 @@ export class WorkflowService {
         customerId: input.customerId,
         resourceVersion,
         policy: settings.policy.revision,
+        prompt: snapshot.metadata.snapshotHash,
         privacy: privacy.profile.revision,
       });
       const result: Workflow = {
@@ -167,6 +179,7 @@ export class WorkflowService {
         id,
         idempotencyKey: input.idempotencyKey,
         requestHash,
+        promptHash: snapshot.metadata.snapshotHash,
         result,
         policyRevision: settings.policy.revision,
         privacyRevision: privacy.profile.revision,
@@ -183,12 +196,14 @@ export class WorkflowService {
     access: WorkflowAccess,
   ): Promise<Workflow> {
     return this.data.transaction(async (manager) => {
+      const snapshot = await this.policies.within(manager, true);
       await this.lockSettings(manager);
       const row = await manager.findOneOrFail(WorkflowEntity, {
         where: { id },
         lock: { mode: 'pessimistic_write' },
       });
       this.authorize(row, access);
+      if (row.promptHash !== snapshot.metadata.snapshotHash) conflict('PLAN_CHANGED');
       if (
         row.result.archivedAt ||
         row.result.planHash !== planHash ||
@@ -209,6 +224,7 @@ export class WorkflowService {
   }
   async execute(id: string, planHash: string, access: WorkflowAccess): Promise<Workflow> {
     const prepared = await this.data.transaction(async (manager) => {
+      const snapshot = await this.policies.within(manager, true);
       const settings = await this.lockSettings(manager);
       const privacy = await manager.findOneOrFail(PrivacyEntity, {
         where: { id: 1 },
@@ -224,6 +240,7 @@ export class WorkflowService {
       if (Date.now() - Date.parse(row.result.createdAt) > 900000) conflict('PLAN_EXPIRED');
       if (row.result.state !== 'ready' || !row.result.confirmed) conflict('APPROVAL_REQUIRED');
       if (
+        row.promptHash !== snapshot.metadata.snapshotHash ||
         row.policyRevision !== settings.policy.revision ||
         row.privacyRevision !== privacy.profile.revision
       )
