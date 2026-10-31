@@ -1,0 +1,111 @@
+@layer components {
+  .panel {
+    @apply overflow-hidden rounded-lg border border-line bg-surface;
+  }
+  .sidebar {
+    @apply fixed inset-y-0 left-0 z-10 flex w-52 flex-col border-r border-line bg-[#18191c] px-4 py-8;
+  }
+  .brand {
+    @apply mx-3 mb-8 text-2xl font-semibold tracking-tighter;
+  }
+  .brand span {
+    @apply ml-1 text-accent;
+  }
+  .sidebar-company {
+    @apply cluster border-y border-line px-1 py-4;
+  }
+  .company-avatar {
+    @apply grid size-8 shrink-0 place-items-center rounded-md bg-soft text-xs text-accent;
+  }
+  .sidebar-company b {
+    @apply block max-w-28 truncate text-xs font-medium;
+  }
+  .sidebar-company small {
+    @apply block text-[10px] text-muted;
+  }
+  .eyebrow {
+    @apply text-[9px] font-medium tracking-[.16em] text-muted;
+  }
+  .nav-caption {
+    @apply mb-3 mt-8 px-3;
+  }
+  .sidebar nav {
+    @apply grid gap-1.5;
+  }
+  .nav-link {
+    @apply cluster rounded-md border border-transparent px-3 py-3 text-xs text-muted;
+  }
+  .nav-link:hover {
+    @apply bg-raised;
+  }
+  .nav-link.is-active {
+    @apply border-accent/20 bg-soft text-accent;
+  }
+  .nav-link span {
+    @apply w-4 text-base;
+  }
+  .sidebar-bottom {
+    @apply mt-auto px-2 pt-4 text-[10px] text-muted;
+  }
+  .sidebar-bottom small {
+    @apply mt-1 block text-[9px] text-muted/70;
+  }
+  .status-dot {
+    @apply mr-1.5 inline-block size-1 rounded-full bg-positive;
+  }
+  .workspace-shell {
+    @apply ml-52;
+  }
+  .topbar {
+    @apply cluster h-16 justify-between border-b border-line px-8;
+  }
+  .breadcrumb {
+    @apply cluster text-xs;
+  }
+  .breadcrumb span {
+    @apply text-muted;
+  }
+  .breadcrumb b {
+    @apply font-normal;
+  }
+  .header-status {
+    @apply cluster text-[10px] text-muted;
+  }
+  .avatar {
+    @apply grid size-8 shrink-0 place-items-center rounded-full bg-soft text-[9px] font-medium text-accent;
+  }
+  main {
+    @apply mx-auto max-w-[1600px] px-8 py-8;
+  }
+  .page-heading {
+    @apply mb-6 flex items-center justify-between gap-5;
+  }
+  .page-heading h1 {
+    @apply mb-2 mt-3;
+  }
+  .page-description {
+    @apply text-xs text-muted;
+  }
+  .badge {
+    @apply inline-block whitespace-nowrap rounded border border-accent/20 bg-soft px-2 py-1 text-[8px] tracking-wide text-accent;
+  }
+  .button-primary,
+  .button-secondary {
+    @apply inline-flex min-h-9 items-center justify-center rounded-md border px-3.5 py-2.5 text-xs font-medium;
+  }
+  .button-primary {
+    @apply border-accent bg-accent text-[#211c29];
+  }
+  .button-primary:hover {
+    @apply brightness-110;
+  }
+  .button-secondary {
+    @apply border-line bg-raised text-ink;
+  }
+  .button-secondary:hover {
+    @apply border-accent/40;
+  }
+  .full-width {
+    @apply mt-5 w-full;
+  }
+}
