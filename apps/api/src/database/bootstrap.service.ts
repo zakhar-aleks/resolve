@@ -1,6 +1,7 @@
 import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { DEFAULT_COMPANY } from '@resolve/contracts';
+import { DEFAULT_COMPANY, DEFAULT_PRIVACY } from '@resolve/contracts';
+import { PrivacyEntity } from './entities/privacy.entity';
 import { CompanyEntity } from './entities/company.entity';
 import { CaseEntity } from './entities/case.entity';
 import { SEED_CASES } from './seeds';
@@ -18,6 +19,13 @@ export class BootstrapService implements OnApplicationBootstrap {
       .insert()
       .into(CompanyEntity)
       .values({ id: 1, profile: DEFAULT_COMPANY })
+      .orIgnore()
+      .execute();
+    await this.data
+      .createQueryBuilder()
+      .insert()
+      .into(PrivacyEntity)
+      .values({ id: 1, profile: DEFAULT_PRIVACY })
       .orIgnore()
       .execute();
     for (const input of SEED_CASES) {
@@ -39,22 +47,24 @@ export class BootstrapService implements OnApplicationBootstrap {
         .execute();
     }
     if (environment.STRIPE_TEST_CUSTOMER_ID && environment.STRIPE_TEST_PAYMENT_INTENT_ID) {
-      const record = await this.stripe.readPayment({
-        id: 'stripe',
-        name: 'Stripe test customer',
-        title: 'Connected Stripe test payment',
-        message: 'Please refund this test payment.',
-        amountCents: 1,
-        ageDays: 0,
-        reason: 'requested',
-        customerId: environment.STRIPE_TEST_CUSTOMER_ID,
-        paymentId: environment.STRIPE_TEST_PAYMENT_INTENT_ID,
-        refundedCents: 0,
-        currency: 'usd',
-        provider: 'stripe',
-        paymentStatus: 'unknown',
-        subscriptionStatus: 'active',
-      });
+      const record = await this.stripe.readPayment(
+        this.data.getRepository(CaseEntity).create({
+          id: 'stripe',
+          name: 'Stripe test customer',
+          title: 'Connected Stripe test payment',
+          message: 'Please refund this test payment.',
+          amountCents: 1,
+          ageDays: 0,
+          reason: 'requested',
+          customerId: environment.STRIPE_TEST_CUSTOMER_ID,
+          paymentId: environment.STRIPE_TEST_PAYMENT_INTENT_ID,
+          refundedCents: 0,
+          currency: 'usd',
+          provider: 'stripe',
+          paymentStatus: 'unknown',
+          subscriptionStatus: 'active',
+        }),
+      );
       await this.data
         .createQueryBuilder()
         .insert()

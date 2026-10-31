@@ -16,4 +16,36 @@ export class CaseEntity implements SupportCase {
   @Column('text', { default: 'simulator' }) provider!: SupportCase['provider'];
   @Column('text', { default: 'paid' }) paymentStatus!: string;
   @Column('text', { default: 'active' }) subscriptionStatus!: SupportCase['subscriptionStatus'];
+  @Column('text', { default: '' }) summary = '';
+  @Column('text', { default: 'pending' }) triageStatus: SupportCase['triageStatus'] = 'pending';
+  @Column('text', { array: true, default: () => "'{}'" }) tags: string[] = [];
+  @Column('text', { default: '' }) assignee = '';
+  @Column('text', { default: 'workspace' }) channel: SupportCase['channel'] = 'workspace';
+  @Column('text', { nullable: true, unique: true }) externalId: string | null = null;
+  @Column('text', { default: 'allowed' }) aiPreference: SupportCase['aiPreference'] = 'allowed';
+  @Column('timestamptz', {
+    default: () => 'CURRENT_TIMESTAMP',
+    transformer: {
+      to: (value: string | undefined) => (value === undefined ? undefined : new Date(value)),
+      from: (value: Date) => value.toISOString(),
+    },
+  })
+  receivedAt = new Date().toISOString();
+  @Column('timestamptz', {
+    nullable: true,
+    transformer: {
+      to: (value: string | null) => (value ? new Date(value) : null),
+      from: (value: Date | null) => value?.toISOString() ?? null,
+    },
+  })
+  closedAt: string | null = null;
+  @Column('timestamptz', {
+    nullable: true,
+    transformer: {
+      to: (value: string | null) => (value ? new Date(value) : null),
+      from: (value: Date | null) => value?.toISOString() ?? null,
+    },
+  })
+  archivedAt: string | null = null;
+  @Column('text', { default: 'open' }) status: SupportCase['status'] = 'open';
 }
