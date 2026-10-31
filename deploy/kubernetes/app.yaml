@@ -82,8 +82,6 @@ spec:
               value: 0.0.0.0
             - name: PORT
               value: '8787'
-            - name: ALLOW_BASIC_AUTH
-              value: 'false'
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

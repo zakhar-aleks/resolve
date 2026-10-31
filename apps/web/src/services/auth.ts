@@ -12,7 +12,7 @@ export const ProfileSchema = z.object({
   ),
 });
 export const providers = () =>
-  apiRequest('/auth/providers', z.object({ google: z.boolean(), apple: z.boolean() }));
+  apiRequest('/auth/providers', z.object({ google: z.boolean(), apple: z.boolean(), demo:z.boolean().default(false) }));
 export const profile = (token: string) =>
   apiRequest('/auth/session', ProfileSchema, 'POST', { token });
 export const cookieName = () =>

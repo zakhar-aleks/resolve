@@ -39,6 +39,7 @@ export class AuthService {
   }
   providers() {
     return {
+      demo:environment.ALLOW_BASIC_AUTH==='true',
       google: !!(environment.GOOGLE_CLIENT_ID && environment.GOOGLE_CLIENT_SECRET),
       apple: !!(environment.APPLE_CLIENT_ID && environment.APPLE_CLIENT_SECRET),
     };

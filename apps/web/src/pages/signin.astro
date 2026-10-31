@@ -3,7 +3,7 @@ import AppLayout from '../layouts/AppLayout.astro';
 import PublicHeader from '../components/PublicHeader.astro';
 import { AUTH_COPY as text } from '../consts/copy/auth';
 import { providers } from '../services/auth';
-const enabled = await providers().catch(() => ({ google: false, apple: false }));
+const enabled = await providers().catch(() => ({ google: false, apple: false, demo:false }));
 ---
 
 <AppLayout

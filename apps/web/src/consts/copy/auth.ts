@@ -1,4 +1,5 @@
 export const AUTH_COPY = {
+  demo:'Open protected demo',
   separator: '·',
   signIn: 'Sign in',
   title: 'Your team. Your workspace.',

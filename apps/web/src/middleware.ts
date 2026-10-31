@@ -38,10 +38,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   else if (publicRoute(context.url) || authRoute) response = await next();
   else if (
     serverEnvironment('ALLOW_BASIC_AUTH') === 'true' &&
+    !token &&
     operatorAuthorized(context.request.headers.get('authorization'), password)
   )
     response = await next();
   else {
+    if(!token&&serverEnvironment('ALLOW_BASIC_AUTH')==='true')return new Response('Authentication required.',{status:401,headers:{...headers,'WWW-Authenticate':'Basic realm="Resolve demo", charset="UTF-8"'}});
     const account = token ? await profile(token).catch(() => null) : null;
     if (!account)
       response = new Response(null, {
