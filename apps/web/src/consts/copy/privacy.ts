@@ -37,7 +37,7 @@ export const PRIVACY_COPY = {
       'Human-only preferences always take priority. Turning off optional processing does not waive GDPR or any other mandatory privacy rights.',
     retention: 'Closed conversation retention · days',
     retentionNote:
-      'After this period, closed-request names, messages, summaries, tags, and reply drafts are removed from the active database. Minimal action records remain. Backup, provider, and statutory retention require a separate policy.',
+      'After this period, closed-request names, messages, summaries, tags, and reply drafts are removed from the active database. Closed action-request content is also removed; minimal action references remain. Backup, provider, and statutory retention require a separate policy.',
     save: 'Save privacy settings',
     saved:
       'Privacy settings saved. Open requests will be prepared again under the updated controls.',
@@ -77,7 +77,7 @@ export const PRIVACY_COPY = {
       'You may ask the support team to handle your request without external AI. That preference takes priority. If processing relies on consent, you may withdraw that consent; this does not remove processing justified on another applicable lawful basis or the company’s statutory duties.',
     sharingTitle: 'Connected services and international transfers',
     sharingBody:
-      'The company may connect Slack for incoming mentions, a payment provider for verified billing actions, and approved AI providers for optional assistance. It must identify its actual processors, enter appropriate contracts, explain recipients and locations, and assess any transfer outside the EEA using an applicable lawful mechanism. Selecting an EEA business context does not guarantee EEA-only processing.',
+      'The company may connect Slack for incoming mentions, payment or company service providers for verified billing, order, booking, account and privacy-case actions, and approved AI providers for optional assistance. It must identify its actual processors, enter appropriate contracts, explain recipients and locations, and assess any transfer outside the EEA using an applicable lawful mechanism. Selecting an EEA business context does not guarantee EEA-only processing.',
     retentionTitle: 'How long information is kept',
     retentionTemplate:
       'This workspace removes the content of eligible closed conversations after {days} days. Minimal payment-action records may remain for accountability and legal obligations. The company must define and document separate retention for backups, external providers, unresolved requests, and any statutory records.',

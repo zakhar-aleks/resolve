@@ -1,3 +1,4 @@
+import { WorkflowEntity } from '../database/entities/workflow.entity';
 import { Injectable } from '@nestjs/common';
 import { DataSource, In, IsNull, LessThan } from 'typeorm';
 import { randomUUID } from 'node:crypto';
@@ -75,6 +76,26 @@ export class PrivacyService {
           await manager.save(run);
         }
         archived++;
+      }
+      const workflows = await manager
+        .getRepository(WorkflowEntity)
+        .createQueryBuilder('workflow')
+        .where(
+          "workflow.result->>'state' IN ('blocked','succeeded','failed') AND workflow.result->>'archivedAt' IS NULL AND workflow.result->>'updatedAt' < :cutoff",
+          { cutoff },
+        )
+        .setLock('pessimistic_write')
+        .setOnLocked('skip_locked')
+        .take(50)
+        .getMany();
+      for (const workflow of workflows) {
+        workflow.result.action = null;
+        workflow.result.customerId = '';
+        workflow.result.summary = 'Request content removed under retention policy.';
+        workflow.result.checks = [];
+        workflow.result.archivedAt = new Date().toISOString();
+        workflow.planRef = '';
+        await manager.save(workflow);
       }
       return { archived };
     });
