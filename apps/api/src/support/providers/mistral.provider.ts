@@ -1,3 +1,4 @@
+import { workspaceContext } from '../../tenancy/context';
 import { modelBillingContext } from '../helpers/summary';
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
@@ -17,6 +18,7 @@ import type { PromptTask } from '../prompts/foundation';
 const envelope = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string() }) })).min(1),
 });
+let demoCalls=0;let demoWindow=0;let demoMinuteCalls=0;
 @Injectable()
 export class MistralProvider {
   constructor(
@@ -33,6 +35,7 @@ export class MistralProvider {
   ): Promise<T> {
     if (!this.connections.getMistralKey()) invalid('MISTRAL_KEY_REQUIRED');
     await this.policies.assertExternalAllowed(snapshot, record);
+    if(environment.PUBLIC_DEMO==='true'&&!workspaceContext.getStore()){if(Date.now()-demoWindow>60000){demoWindow=Date.now();demoMinuteCalls=0;}if(demoCalls>=100||demoMinuteCalls>=20)throw new Error('DEMO_MODEL_LIMIT');demoCalls++;demoMinuteCalls++;}
     const response = await requestJson('https://api.mistral.ai/v1/chat/completions', envelope, {
       method: 'POST',
       headers: {
