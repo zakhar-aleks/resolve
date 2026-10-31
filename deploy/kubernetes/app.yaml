@@ -1,0 +1,190 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resolve-proxy
+  namespace: resolve
+data:
+  Caddyfile: |
+    {
+      admin off
+      auto_https disable_redirects
+      http_port 8080
+      https_port 8443
+    }
+    http://{$PUBLIC_DOMAIN}:8080 {
+      redir https://{$PUBLIC_DOMAIN}{uri} permanent
+    }
+    https://{$PUBLIC_DOMAIN}:8443 {
+      header Strict-Transport-Security "max-age=31536000"
+      request_body {
+        max_size 80KB
+      }
+      reverse_proxy 127.0.0.1:8787
+    }
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: resolve-certificates
+  namespace: resolve
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: do-block-storage
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resolve
+  namespace: resolve
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: resolve
+  template:
+    metadata:
+      labels:
+        app: resolve
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      imagePullSecrets:
+        - name: registry-resolve
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: REPLACE_WITH_REGISTRY_IMAGE
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: resolve-secrets
+          env:
+            - name: DATABASE_URL
+              value: postgresql://resolve:$(POSTGRES_PASSWORD)@postgres:5432/resolve
+            - name: API_URL
+              value: http://127.0.0.1:8788/api
+            - name: WEB_ORIGIN
+              value: https://$(PUBLIC_DOMAIN)
+            - name: API_PORT
+              value: '8788'
+            - name: HOST
+              value: 0.0.0.0
+            - name: PORT
+              value: '8787'
+            - name: ALLOW_BASIC_AUTH
+              value: 'false'
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          startupProbe:
+            exec:
+              command: [node, scripts/container-health.mjs]
+            periodSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command: [node, scripts/container-health.mjs]
+            periodSeconds: 15
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8787
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 250m
+              memory: 384Mi
+            limits:
+              cpu: '1'
+              memory: 1Gi
+        - name: proxy
+          image: caddy:2
+          env:
+            - name: PUBLIC_DOMAIN
+              valueFrom:
+                secretKeyRef:
+                  name: resolve-secrets
+                  key: PUBLIC_DOMAIN
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: https
+              containerPort: 8443
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          volumeMounts:
+            - name: proxy-config
+              mountPath: /etc/caddy/Caddyfile
+              subPath: Caddyfile
+              readOnly: true
+            - name: certificates
+              mountPath: /data
+            - name: caddy-config
+              mountPath: /config
+      volumes:
+        - name: proxy-config
+          configMap:
+            name: resolve-proxy
+        - name: certificates
+          persistentVolumeClaim:
+            claimName: resolve-certificates
+        - name: caddy-config
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resolve-public
+  namespace: resolve
+spec:
+  type: LoadBalancer
+  selector:
+    app: resolve
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+    - name: https
+      port: 443
+      targetPort: https
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-only
+  namespace: resolve
+spec:
+  podSelector:
+    matchLabels:
+      app: resolve
+  policyTypes: [Ingress]
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8443
