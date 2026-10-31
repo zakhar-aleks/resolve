@@ -35,6 +35,7 @@ before(
         SERVICE_CONNECTOR_TOKEN: '',
         SLACK_BOT_TOKEN: '',
         MISTRAL_API_KEY: '',
+        MISTRAL_LARGE_MODEL: '',
         SLACK_APP_TOKEN: '',
         SLACK_TEAM_ID: '',
         SLACK_CHANNEL_IDS: '',
@@ -442,7 +443,9 @@ test('connector dispatch is claimed once and unknown outcomes reconcile without 
       };
     },
   };
-  const service = new WorkflowService(data, connector);
+  const { PolicyContextService } =
+    await import('../dist/support/prompts/policy-context.service.js');
+  const service = new WorkflowService(data, connector, new PolicyContextService(data));
   try {
     const workflow = await service.prepare(
       {
@@ -493,5 +496,146 @@ test('expired workflow content is removed while idempotency identity remains', a
     assert.ok(archived.receiptId);
   } finally {
     await client.end();
+  }
+});
+test('saved company, action and privacy changes rebuild the effective system prompt', async () => {
+  const first = (await request('/company/prompt')).body;
+  assert.ok(first.systemPrompt.includes('POLITENESS'));
+  assert.ok(first.systemPrompt.includes('PRIVACY'));
+  assert.ok(first.systemPrompt.includes('SECURITY'));
+  const company = (await request('/company')).body;
+  const updated = await request('/company', 'PUT', {
+    ...company,
+    writtenPolicy: 'PROMPT-POLICY-MARKER: route exceptions to a specialist.',
+  });
+  assert.equal(updated.status, 200);
+  const next = (await request('/company/prompt')).body;
+  assert.notEqual(next.metadata.snapshotHash, first.metadata.snapshotHash);
+  assert.ok(next.systemPrompt.includes('PROMPT-POLICY-MARKER'));
+  assert.equal(next.metadata.companyRevision, updated.body.revision);
+  const policy = (await agent('/policy')).body;
+  await agent('/policy', 'PUT', { ...policy, maxRecoveryPerDay: 2 }, reviewerKey);
+  const actions = (await request('/company/prompt')).body;
+  assert.notEqual(actions.metadata.snapshotHash, next.metadata.snapshotHash);
+  assert.ok(actions.systemPrompt.includes('"maxRecoveryPerDay": 2'));
+  const privacy = (await request('/privacy')).body;
+  await request('/privacy', 'PUT', {
+    ...privacy,
+    retentionDays: 45,
+    tasks: privacy.tasks.map((task) =>
+      task.id === 'scope' ? { ...task, evidence: 'DO-NOT-SEND-INTERNAL-EVIDENCE' } : task,
+    ),
+  });
+  const latest = (await request('/company/prompt')).body;
+  assert.notEqual(latest.metadata.snapshotHash, actions.metadata.snapshotHash);
+  assert.equal(latest.systemPrompt.includes('DO-NOT-SEND-INTERNAL-EVIDENCE'), false);
+  assert.equal((await agent('/prompt')).status, 401);
+  assert.equal(
+    (await agent('/prompt', 'GET', undefined, reviewerKey)).body.metadata.snapshotHash,
+    latest.metadata.snapshotHash,
+  );
+});
+test('a company policy change invalidates an unexecuted non-payment plan', async () => {
+  const plan = (
+    await agent(
+      '/requests',
+      'POST',
+      workflowInput({
+        kind: 'update_preferences',
+        resourceId: 'customer_demo',
+        marketingEmail: false,
+        productUpdates: true,
+      }),
+    )
+  ).body;
+  assert.equal(plan.state, 'ready');
+  const company = (await request('/company')).body;
+  await request('/company', 'PUT', { ...company, context: 'Updated support context' });
+  assert.equal(
+    (await agent(`/requests/${plan.id}/execute`, 'POST', { planHash: plan.planHash }, reviewerKey))
+      .body.code,
+    'PLAN_CHANGED',
+  );
+});
+test('a recommendation completed after a policy change is discarded, not saved', async () => {
+  const { DataSource } = await import('typeorm');
+  const { databaseOptions } = await import('../dist/database/data-source.js');
+  const { PolicyContextService } =
+    await import('../dist/support/prompts/policy-context.service.js');
+  const { SupportService } = await import('../dist/support/support.service.js');
+  const { StripeProvider } = await import('../dist/billing/stripe.provider.js');
+  const data = new DataSource({ ...databaseOptions, url: url.href, migrationsRun: false });
+  await data.initialize();
+  const intake = (
+    await request('/intake', 'POST', {
+      name: 'Fictional race customer',
+      title: 'Delivery change',
+      message: 'Change my address',
+      aiPreference: 'human_only',
+    })
+  ).body;
+  let started;
+  let release;
+  const entered = new Promise((resolve) => {
+    started = resolve;
+  });
+  const waiting = new Promise((resolve) => {
+    release = resolve;
+  });
+  const orchestrator = {
+    prepare: async () => {
+      started();
+      await waiting;
+      return {
+        analysis: {
+          intent: 'investigate',
+          summary: 'STALE-TEST-RECOMMENDATION',
+          source: 'delayed-test',
+        },
+        checks: [],
+        decision: {
+          action: 'review',
+          risk: null,
+          fulfillment: null,
+          confidence: null,
+          rationale: '',
+          reply: '',
+          source: 'delayed-test',
+        },
+        routing: {
+          scenario: 'change_address',
+          complexity: 'low',
+          destination: 'local',
+          model: null,
+          reason: 'human_only',
+        },
+      };
+    },
+  };
+  const service = new SupportService(
+    data,
+    new StripeProvider(),
+    new PolicyContextService(data),
+    orchestrator,
+  );
+  try {
+    const pending = service.analyze(intake.reference, 'Change my address').catch((error) => error);
+    await entered;
+    const company = (await request('/company')).body;
+    await request('/company', 'PUT', {
+      ...company,
+      writtenPolicy: 'A new policy arrived while the analysis was running.',
+    });
+    release();
+    const error = await pending;
+    assert.equal(error.getResponse().code, 'POLICY_CHANGED');
+    const rows = await data.query(
+      `SELECT id FROM support_runs WHERE "caseId"=$1 AND result->'analysis'->>'source'='delayed-test'`,
+      [intake.reference],
+    );
+    assert.equal(rows.length, 0);
+  } finally {
+    release?.();
+    await data.destroy();
   }
 });
