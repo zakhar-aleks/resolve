@@ -1,3 +1,4 @@
+import { serverEnvironment } from './server-environment';
 import type { z } from 'zod';
 import { ErrorSchema } from '@resolve/contracts';
 export class ApiError extends Error {
@@ -11,12 +12,15 @@ export async function apiRequest<T>(
   method = 'GET',
   body?: unknown,
 ): Promise<T> {
-  const base = import.meta.env.API_URL ?? 'http://127.0.0.1:8788/api';
+  const base = serverEnvironment('API_URL') || 'http://127.0.0.1:8788/api';
   let response: Response;
   try {
     response = await fetch(`${base}${path}`, {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Resolve-Internal': serverEnvironment('INTERNAL_API_TOKEN'),
+      },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       signal: AbortSignal.timeout(60000),
     });
