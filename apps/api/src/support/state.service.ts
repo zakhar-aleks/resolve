@@ -1,3 +1,5 @@
+import { WorkflowService } from '../workflows/workflow.service';
+import { workflowIntent } from '../workflows/domain/intent';
 import { PrivacyService } from '../privacy/privacy.service';
 import { SlackService } from '../slack/slack.service';
 import { Injectable } from '@nestjs/common';
@@ -17,6 +19,7 @@ export class StateService {
     private readonly connections: ConnectionsService,
     private readonly privacy: PrivacyService,
     private readonly slack: SlackService,
+    private readonly workflows: WorkflowService,
   ) {}
   async get(): Promise<AppState> {
     const [company, cases, runs, operations, events] = await Promise.all([
@@ -28,9 +31,15 @@ export class StateService {
     ]);
     return {
       company,
+      workflows: await this.workflows.list('demo'),
+      workflowPolicy: await this.workflows.policy(),
+      demoService: await this.workflows.demoState(),
       privacy: await this.privacy.get(),
       slack: this.slack.status(),
-      cases,
+      cases: cases.map((record) => ({
+        ...record,
+        suggestedAction: workflowIntent(record.message),
+      })),
       runs: runs.map((run) => run.result),
       operations: operations.map(serializeOperation),
       events: events.map((event) => ({ ...event, createdAt: event.createdAt.toISOString() })),

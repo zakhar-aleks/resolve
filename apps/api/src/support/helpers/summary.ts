@@ -1,5 +1,24 @@
+import { workflowIntent } from '../../workflows/domain/intent';
 import type { Analysis, SupportCase } from '@resolve/contracts';
 export function localSummary(record: SupportCase, intent: Analysis['intent']): string {
+  const workflow = workflowIntent(record.message);
+  if (workflow)
+    return (
+      {
+        change_address:
+          'Customer wants to change their delivery address. Verify ownership and fulfilment status before making a change.',
+        arrange_return:
+          'Customer needs a return or replacement. Check eligibility, stock, and company limits.',
+        reschedule_appointment:
+          'Customer wants to change a booking. Check availability and confirm the new appointment.',
+        recover_account:
+          'Customer needs help accessing their account. Use the identity provider’s verified recovery process.',
+        update_preferences:
+          'Customer wants to change communication preferences. Verify the account and requested changes.',
+        privacy_request:
+          'Customer is asking about their personal data. Verify identity and route the request for specialist review.',
+      } as const
+    )[workflow];
   if (record.provider === 'unlinked')
     return intent === 'refund'
       ? /twice|duplicate/iu.test(record.message)
@@ -20,6 +39,8 @@ export function localSummary(record: SupportCase, intent: Analysis['intent']): s
   return 'Customer reports an unrecognized payment. Verify the charge with them before taking action.';
 }
 export function suggestedTags(record: SupportCase, intent: Analysis['intent']): string[] {
+  const workflow = workflowIntent(record.message);
+  if (workflow) return ['Customer care', workflow.replaceAll('_', ' ')];
   return intent === 'cancel'
     ? ['Subscriptions', 'Cancellation']
     : record.reason === 'duplicate'
