@@ -1,0 +1,208 @@
+@layer components {
+  .integration-row {
+    @apply flex flex-wrap gap-2;
+  }
+  .integration {
+    @apply rounded-md border border-line px-2.5 py-1.5 text-[9px] text-muted;
+  }
+  .policy-banner {
+    @apply mt-3 text-[10px] text-accent/80;
+  }
+  .metrics {
+    @apply my-6 grid grid-cols-4 border-y border-line py-5;
+  }
+  .metrics > div {
+    @apply grid gap-2 border-r border-line px-5;
+    grid-template-columns: auto 1fr;
+  }
+  .metrics > div:first-child {
+    @apply pl-0;
+  }
+  .metrics > div:last-child {
+    @apply border-0;
+  }
+  .metrics span {
+    @apply col-span-2 text-[8px] tracking-widest text-muted;
+  }
+  .metrics strong {
+    @apply text-2xl font-normal tracking-tight;
+  }
+  .metrics small {
+    @apply self-end pb-1 text-[9px] text-muted;
+  }
+  .metrics > div:last-child strong {
+    @apply col-span-2 text-lg text-positive;
+  }
+  .metrics > div:last-child small {
+    @apply col-span-2 p-0;
+  }
+  .work-grid {
+    @apply grid items-stretch gap-3.5;
+    grid-template-columns: 220px minmax(300px, 1fr) 265px;
+  }
+  .panel-heading {
+    @apply cluster min-h-16 justify-between border-b border-line px-4 py-4;
+  }
+  .panel-heading h2 {
+    @apply text-xs;
+  }
+  .panel-heading .badge {
+    @apply ml-1;
+  }
+  .subtle {
+    @apply text-[9px] leading-7 text-muted;
+  }
+  .case-link {
+    @apply block border-b border-l-2 border-b-line border-l-transparent px-3 py-4;
+  }
+  .case-link:hover {
+    @apply bg-raised;
+  }
+  .case-link.is-active {
+    @apply border-l-accent bg-soft;
+  }
+  .case-top {
+    @apply cluster gap-2;
+  }
+  .case-top .avatar {
+    @apply size-7 text-[8px];
+  }
+  .case-top b {
+    @apply text-[10px] font-medium;
+  }
+  .case-top small {
+    @apply ml-auto text-[8px] text-muted;
+  }
+  .case-link h3 {
+    @apply mt-2 text-xs;
+  }
+  .case-link p {
+    @apply mt-1 truncate text-[9px] text-muted;
+  }
+  .inbox-footer {
+    @apply px-3 py-4 text-[8px] text-muted;
+  }
+  .conversation-body {
+    @apply p-5;
+  }
+  .customer-label {
+    @apply cluster mb-4;
+  }
+  .customer-label b {
+    @apply text-xs font-medium;
+  }
+  .customer-label small {
+    @apply mt-1 block text-[9px] text-muted;
+  }
+  .payment {
+    @apply mt-4 grid gap-2 rounded-md border border-line p-3 text-[9px] text-muted;
+    grid-template-columns: 1fr auto;
+  }
+  .payment b {
+    @apply text-[10px] font-medium text-ink/80;
+  }
+  .payment code {
+    @apply text-[8px];
+  }
+  .agent-label {
+    @apply cluster mt-6 gap-2;
+  }
+  .agent-label b {
+    @apply text-xs font-medium;
+  }
+  .agent-label .subtle {
+    @apply ml-auto text-[8px];
+  }
+  .agent-icon {
+    @apply rounded-md bg-soft px-1.5 text-lg text-accent;
+  }
+  .agent-output {
+    @apply pb-3 pt-4;
+  }
+  .agent-output h3 {
+    @apply mb-3 text-base font-medium;
+  }
+  .agent-output > p {
+    @apply mb-3 text-xs leading-6 text-muted;
+  }
+  .receipt {
+    @apply break-all rounded-md border border-positive/20 bg-positive/5 p-3 font-mono text-[9px] leading-5 text-positive;
+  }
+  .receipt b {
+    @apply font-normal;
+  }
+  .action-row {
+    @apply cluster mt-3 flex-wrap;
+  }
+  .timing {
+    @apply ml-3;
+  }
+  .decision-body {
+    @apply p-4;
+  }
+  .recommendation {
+    @apply mb-1 mt-3 text-xl font-medium tracking-tight;
+  }
+  .score {
+    @apply mt-6 flex items-center justify-between gap-2 border-b border-line pb-2 text-[9px] text-muted;
+  }
+  .score b {
+    @apply whitespace-nowrap font-normal text-accent;
+  }
+  .divider {
+    @apply my-6 h-px bg-line;
+  }
+  .section-label {
+    @apply flex justify-between gap-2 text-[8px] tracking-wide text-muted;
+  }
+  .section-label small {
+    @apply max-w-20 truncate text-[7px];
+  }
+  .checks {
+    @apply mt-4;
+  }
+  .check {
+    @apply my-3 flex gap-2 text-[10px] text-ink/80;
+  }
+  .check > span {
+    @apply text-positive;
+  }
+  .check.is-failed > span {
+    @apply text-negative;
+  }
+  .check small {
+    @apply mt-1 block text-[8px] text-muted;
+  }
+  .policy-note {
+    @apply mt-5 rounded-md border border-line bg-raised/50 p-3 text-[9px] leading-6 text-muted;
+  }
+  .ledger {
+    @apply mt-5;
+  }
+  .events {
+    @apply max-h-60 overflow-auto px-4;
+  }
+  .events > p {
+    @apply py-3;
+  }
+  .event {
+    @apply grid items-center gap-3 border-b border-line py-3 text-[10px];
+    grid-template-columns: 75px 95px 1fr 80px;
+  }
+  .event code,
+  .event time {
+    @apply text-[9px] text-muted;
+  }
+  .event time {
+    @apply text-right;
+  }
+  .event p {
+    @apply text-muted;
+  }
+  .event-state {
+    @apply text-[9px] text-positive;
+  }
+  footer {
+    @apply mt-6 flex justify-between gap-4 text-[7px] tracking-widest text-muted/60;
+  }
+}
