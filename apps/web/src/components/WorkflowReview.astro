@@ -1,0 +1,87 @@
+---
+import type { Workflow } from '@resolve/contracts';
+import { COPY } from '../consts/copy';
+import { workflowReview } from '../services/workflow-view';
+import ActionForm from './ActionForm.astro';
+interface Props {
+  workflow: Workflow;
+}
+const { workflow } = Astro.props;
+const text = COPY.workflows;
+const view = workflowReview(workflow);
+---
+
+<article class="panel workflow-review">
+  <div class="card-heading">
+    <h3>{view.title}</h3><span class="badge">{view.stateLabel}</span>
+  </div><p>{workflow.summary}</p><ul class="workflow-checks">
+    {
+      workflow.checks.map((check) => (
+        <li>
+          <>
+            <span>{view.checkLabel(check.code)}</span>
+            <b>{check.passed ? text.passed : text.failed}</b>
+          </>
+        </li>
+      ))
+    }
+  </ul>{
+    workflow.action && (
+      <details>
+        <>
+          <summary>{text.proposed}</summary>
+          <dl class="workflow-records">
+            {view.actionDetails.map((detail) => (
+              <div>
+                <dt>{detail.label}</dt>
+                <dd>{detail.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      </details>
+    )
+  }{
+    workflow.receiptId && (
+      <p class="field-note">
+        {text.receipt}
+        <code>{workflow.receiptId}</code>
+      </p>
+    )
+  }{
+    view.confirm && (
+      <ActionForm action="confirm-workflow" view="workflows">
+        <>
+          <input name="workflowId" type="hidden" value={workflow.id} />
+          <input name="planHash" type="hidden" value={workflow.planHash} />
+          <button type="submit" class="button-secondary">
+            {text.customerConfirmation}
+          </button>
+        </>
+      </ActionForm>
+    )
+  }{
+    view.execute && (
+      <ActionForm action="execute-workflow" view="workflows">
+        <>
+          <input name="workflowId" type="hidden" value={workflow.id} />
+          <input name="planHash" type="hidden" value={workflow.planHash} />
+          <button type="submit" class="button-primary">
+            {text.execute}
+          </button>
+        </>
+      </ActionForm>
+    )
+  }{
+    view.reconcile && (
+      <ActionForm action="reconcile-workflow" view="workflows">
+        <>
+          <input name="workflowId" type="hidden" value={workflow.id} />
+          <button type="submit" class="button-secondary">
+            {text.reconcile}
+          </button>
+        </>
+      </ActionForm>
+    )
+  }
+</article>

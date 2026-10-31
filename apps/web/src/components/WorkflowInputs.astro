@@ -1,0 +1,116 @@
+---
+import type { DemoState, WorkflowKind } from '@resolve/contracts';
+import { COPY } from '../consts/copy';
+import { formatAppointment } from '../utils/format';
+interface Props {
+  kind: WorkflowKind;
+  demo: DemoState;
+}
+const { kind, demo } = Astro.props;
+const text = COPY.workflows;
+---
+
+{
+  kind === 'change_address' && (
+    <div class="form-grid">
+      <>
+        <label>
+          {text.address}
+          <input name="line1" value={demo.order.address.line1} required maxlength="180" />
+        </label>
+        <label>
+          {text.city}
+          <input name="city" value={demo.order.address.city} required maxlength="100" />
+        </label>
+        <label>
+          {text.postalCode}
+          <input name="postalCode" value={demo.order.address.postalCode} required maxlength="24" />
+        </label>
+        <label>
+          {text.country}
+          <input
+            name="country"
+            value={demo.order.address.country}
+            required
+            minlength="2"
+            maxlength="2"
+          />
+        </label>
+      </>
+    </div>
+  )
+}
+{
+  kind === 'arrange_return' && (
+    <div class="form-grid">
+      <>
+        <label>
+          {text.quantity}
+          <input name="quantity" type="number" min="1" max="10" value="1" required />
+        </label>
+        <label>
+          {text.resolution}
+          <select name="resolution">
+            <>
+              <option value="return">{text.return}</option>
+              <option value="replacement">{text.replacement}</option>
+            </>
+          </select>
+        </label>
+        <label>
+          {text.reason}
+          <input name="reason" required maxlength="500" />
+        </label>
+      </>
+    </div>
+  )
+}
+{
+  kind === 'reschedule_appointment' && (
+    <label>
+      {text.slot}
+      <select name="slotId" required>
+        {demo.appointment.slots.map((slot) => (
+          <option value={slot.id} disabled={!slot.available}>
+            {formatAppointment(slot.startsAt)}
+          </option>
+        ))}
+      </select>
+    </label>
+  )
+}
+{kind === 'recover_account' && <p class="field-note">{text.recoveryNote}</p>}
+{
+  kind === 'update_preferences' && (
+    <div>
+      <>
+        <label class="check-option">
+          <input type="checkbox" name="marketingEmail" checked={demo.preferences.marketingEmail} />
+          {text.marketing}
+        </label>
+        <label class="check-option">
+          <input type="checkbox" name="productUpdates" checked={demo.preferences.productUpdates} />
+          {text.updates}
+        </label>
+      </>
+    </div>
+  )
+}
+{
+  kind === 'privacy_request' && (
+    <div>
+      <>
+        <label>
+          {text.requestType}
+          <select name="requestType">
+            <>
+              <option value="access">{text.access}</option>
+              <option value="erasure">{text.erasure}</option>
+            </>
+          </select>
+        </label>
+        <p class="field-note">{text.privacyNote}</p>
+      </>
+    </div>
+  )
+}
