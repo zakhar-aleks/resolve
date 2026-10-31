@@ -1,4 +1,5 @@
 ---
+import { AUTH_COPY } from '../consts/copy/auth';
 import { COPY } from '../consts/copy';
 import { VIEWS, type View } from '../consts/routes';
 import { fragmentUrl, workspaceUrl } from '../helpers/routes';
@@ -39,4 +40,5 @@ const { companyName, view } = Astro.props;
   <div class="sidebar-bottom">
     <span class="status-dot"></span>{COPY.shell.local}<small>{COPY.shell.localDetail}</small>
   </div>
+  <a class="nav-item" href="/account">{AUTH_COPY.account}</a>
 </aside>
