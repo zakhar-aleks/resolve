@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "db:start": "node scripts/database.mjs start",
     "db:stop": "node scripts/database.mjs stop",
-    "test:integration": "npm run build -w @resolve/contracts && npm run test:integration -w @resolve/api"
+    "test:integration": "npm run build -w @resolve/contracts && npm run test:integration -w @resolve/api",
+    "agent:keys": "node scripts/agent-keys.mjs"
   },
   "devDependencies": {
     "typescript": "5.9.3",
