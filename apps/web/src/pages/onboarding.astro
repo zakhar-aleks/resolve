@@ -1,0 +1,41 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+import { AUTH_COPY as text } from '../consts/copy/auth';
+import { profile, cookieName } from '../services/auth';
+const token = Astro.cookies.get(cookieName())?.value ?? '';
+const account = await profile(token).catch(() => null);
+if (!account) return Astro.redirect('/signin');
+const joining = !!Astro.cookies.get('resolve_invite')?.value;
+if (account.termsAccepted && account.workspaceId && !joining)
+  return Astro.redirect('/?view=support');
+---
+
+<AppLayout
+  ><main class="auth-panel">
+    <h1>{joining ? text.join : text.onboarding}</h1><p>
+      {joining ? text.joinBody : text.onboardingBody}
+    </p>{Astro.url.searchParams.has('error') && <p role="alert">{text.error}</p>}<form
+      method="post"
+      action="/auth/onboard"
+      class="auth-form"
+    >
+      {
+        !joining && (
+          <label>
+            {text.company}
+            <input name="companyName" maxlength="80" required autocomplete="organization" />
+          </label>
+        )
+      }<label class="auth-check"
+        ><input type="checkbox" name="terms" required /><span
+          >{text.terms} <a href="/terms" target="_blank" rel="noopener">{text.terms}</a></span
+        ></label
+      ><label class="auth-check"
+        ><input type="checkbox" name="privacy" required /><span
+          >{text.privacy}
+          <a href="/account-privacy" target="_blank" rel="noopener">{text.notice}</a></span
+        ></label
+      ><button class="button-primary">{joining ? text.accept : text.create}</button>
+    </form>
+  </main></AppLayout
+>

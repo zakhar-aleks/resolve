@@ -1,0 +1,21 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+import PublicHeader from '../components/PublicHeader.astro';
+import { AUTH_COPY as text } from '../consts/copy/auth';
+import { cookieOptions, cookieName } from '../services/auth';
+const value = Astro.url.searchParams.get('token');
+if (value && /^[A-Za-z0-9_-]{43}$/u.test(value)) {
+  Astro.cookies.set('resolve_invite', value, { ...cookieOptions(), maxAge: 86400 });
+  return Astro.redirect('/join');
+}
+const signedIn = !!Astro.cookies.get(cookieName())?.value;
+---
+
+<AppLayout
+  ><PublicHeader /><main class="auth-panel">
+    <h1>{text.join}</h1><p>{text.joinBody}</p><a
+      class="button-primary"
+      href={signedIn ? '/onboarding' : '/signin'}>{signedIn ? text.accept : text.signInNeeded}</a
+    >
+  </main></AppLayout
+>

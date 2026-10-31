@@ -1,0 +1,39 @@
+@layer components {
+  .auth-panel {
+    @apply mx-auto my-16 max-w-xl space-y-6 rounded-2xl border border-line bg-surface p-8;
+  }
+  .auth-panel h1 {
+    @apply text-3xl font-semibold;
+  }
+  .auth-panel h2 {
+    @apply text-xl font-semibold;
+  }
+  .auth-panel p {
+    @apply leading-7;
+  }
+  .auth-options,
+  .auth-form {
+    @apply grid gap-5;
+  }
+  .auth-form label {
+    @apply grid gap-2;
+  }
+  .auth-form .auth-check {
+    @apply flex items-start gap-3;
+  }
+  .auth-check input {
+    @apply mt-1 h-5 w-5 shrink-0;
+  }
+  .auth-panel section {
+    @apply space-y-4 border-t border-line pt-6;
+  }
+  .auth-panel dd {
+    @apply mb-4;
+  }
+  .auth-panel input[readonly] {
+    @apply w-full;
+  }
+  .auth-wide {
+    @apply max-w-2xl;
+  }
+}
