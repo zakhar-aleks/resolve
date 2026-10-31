@@ -9,6 +9,7 @@ export const SHELL_COPY = {
     company: 'Company & policies',
     connections: 'Integrations',
     privacy: 'Privacy centre',
+    workflows: 'Actions',
   },
   shell: {
     workspace: 'WORKSPACE',
@@ -25,6 +26,7 @@ export const SHELL_COPY = {
     company: '⚑',
     connections: '⌘',
     privacy: '◇',
+    workflows: '↗',
     agent: '✳',
     pass: '✓',
     fail: '!',

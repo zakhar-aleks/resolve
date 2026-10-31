@@ -4,5 +4,5 @@ export const ROUTES = {
   actions: '/actions',
   mistralConsole: 'https://console.mistral.ai',
 } as const;
-export const VIEWS = ['support', 'company', 'connections', 'privacy'] as const;
+export const VIEWS = ['support', 'company', 'connections', 'privacy', 'workflows'] as const;
 export type View = (typeof VIEWS)[number];

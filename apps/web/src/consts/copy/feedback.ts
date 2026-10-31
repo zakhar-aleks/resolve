@@ -44,6 +44,17 @@ export const FEEDBACK_COPY = {
     NOT_FOUND: 'The requested record was not found.',
     INTERNAL_ERROR: 'The request could not be completed. Check the backend logs.',
     API_UNAVAILABLE: 'NestJS is not reachable. Start PostgreSQL and run npm run dev.',
+    PLAN_EXPIRED: 'This preparation expired. Check the request again before approving.',
+    PLAN_CHANGED:
+      'Privacy or action permissions changed. Prepare a new request before approving it.',
+    RESOURCE_CHANGED:
+      'The order or account changed. Prepare a new request with its latest details.',
+    APPROVAL_REQUIRED: 'Confirm the customer’s choice before approving this action.',
+    OWNERSHIP_REQUIRED: 'Customer verification did not pass.',
+    LIVE_API_ONLY: 'Use the authenticated Agent API for connected services.',
+    SERVICE_NOT_CONNECTED: 'Connect your company service before preparing live actions.',
+    INVALID_WORKFLOW_STATE: 'This request cannot make that transition.',
+    IDEMPOTENCY_CONFLICT: 'That request key is already being used for a different change.',
     UNKNOWN: 'The request could not be completed.',
     POLICY_FILE: 'Choose a .txt or .md policy under 50 KB and 10,000 characters.',
     NETWORK: 'The connection failed. Please try again.',

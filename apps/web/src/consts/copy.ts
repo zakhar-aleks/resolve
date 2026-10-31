@@ -1,3 +1,4 @@
+import { WORKFLOWS_COPY } from './copy/workflows';
 import { PRODUCT_COPY } from './copy/product';
 import { PRIVACY_COPY } from './copy/privacy';
 import { SHELL_COPY } from './copy/shell';
@@ -8,6 +9,7 @@ import { FEEDBACK_COPY } from './copy/feedback';
 export const COPY = {
   ...SHELL_COPY,
   ...PRODUCT_COPY,
+  ...WORKFLOWS_COPY,
   ...PRIVACY_COPY,
   ...SUPPORT_COPY,
   ...COMPANY_COPY,
