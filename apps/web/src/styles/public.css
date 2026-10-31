@@ -1,0 +1,244 @@
+@layer components {
+  .public-site {
+    @apply mx-auto max-w-[1440px];
+  }
+  .public-header {
+    @apply flex items-center justify-between gap-6 border-b border-line px-10 py-7;
+  }
+  .public-wordmark {
+    @apply text-3xl font-semibold tracking-tighter text-ink;
+  }
+  .public-wordmark span {
+    @apply ml-1 text-accent;
+  }
+  .public-header nav {
+    @apply flex items-center gap-7 text-sm text-muted;
+  }
+  .public-header nav a:hover {
+    @apply text-ink;
+  }
+  .landing-main {
+    @apply px-12 py-0;
+  }
+  .landing-hero {
+    @apply grid items-center gap-16 py-24;
+    grid-template-columns: 1.1fr 1fr;
+  }
+  .hero-copy h1 {
+    @apply mb-7 mt-6 text-6xl font-medium leading-[1.1] tracking-[-.045em] text-ink;
+    white-space: pre-line;
+  }
+  .hero-description {
+    @apply max-w-xl text-lg leading-8 text-muted;
+  }
+  .hero-actions {
+    @apply mt-9 flex flex-wrap gap-3;
+  }
+  .hero-actions a {
+    @apply px-5 py-3.5 text-sm;
+  }
+  .trust-list {
+    @apply mt-8 flex flex-wrap gap-x-5 gap-y-3 text-xs text-muted;
+  }
+  .trust-list li {
+    @apply flex items-center gap-2;
+  }
+  .trust-list span {
+    @apply text-positive;
+  }
+  .hero-preview {
+    @apply rounded-2xl border border-accent/25 bg-surface p-8;
+    box-shadow:
+      0 25px 100px #0004,
+      0 0 90px #a99bc20a;
+    transform: rotate(-1deg);
+  }
+  .preview-top {
+    @apply flex flex-wrap items-center gap-2 border-b border-line pb-5 text-xs text-muted;
+  }
+  .preview-top .badge {
+    @apply ml-auto;
+  }
+  .preview-customer {
+    @apply mb-6 mt-7 flex items-center gap-3;
+  }
+  .preview-customer b {
+    @apply block text-sm font-medium;
+  }
+  .preview-customer span:not(.avatar) {
+    @apply mt-1 block text-xs text-muted;
+  }
+  .hero-preview h2 {
+    @apply mb-4 text-2xl leading-8 tracking-tight;
+  }
+  .hero-preview > p {
+    @apply text-sm leading-7 text-muted;
+  }
+  .preview-guidance {
+    @apply mb-6 mt-7 flex items-center gap-3 rounded-lg border border-positive/20 bg-positive/5 px-4 py-3 text-xs text-positive;
+  }
+  .preview-action {
+    @apply flex items-center justify-between rounded-lg bg-accent px-4 py-3 text-sm font-medium text-base;
+  }
+  .landing-section {
+    @apply border-t border-line py-20;
+  }
+  .section-intro {
+    @apply mb-10 max-w-2xl;
+  }
+  .section-intro h2,
+  .landing-split h2,
+  .landing-slack h2,
+  .landing-final h2 {
+    @apply my-4 text-4xl font-medium leading-tight tracking-[-.035em];
+  }
+  .section-intro > p:last-child,
+  .landing-split > div > p:not(.eyebrow),
+  .landing-slack p,
+  .landing-final p {
+    @apply text-base leading-8 text-muted;
+  }
+  .steps-grid {
+    @apply grid grid-cols-3 gap-7;
+  }
+  .steps-grid article {
+    @apply rounded-xl border border-line bg-surface p-6;
+  }
+  .step-number {
+    @apply text-xs text-accent;
+  }
+  .steps-grid h3 {
+    @apply mb-3 mt-6 text-lg;
+  }
+  .steps-grid p {
+    @apply text-sm leading-7 text-muted;
+  }
+  .landing-split {
+    @apply grid grid-cols-2 items-center gap-16 border-t border-line py-20;
+  }
+  .privacy-promise {
+    @apply grid gap-4 rounded-xl border border-positive/20 bg-positive/5 p-7;
+  }
+  .privacy-promise p {
+    @apply flex items-center gap-3 text-sm text-ink;
+  }
+  .privacy-promise span {
+    @apply text-positive;
+  }
+  .landing-slack {
+    @apply flex items-center justify-between gap-10 border-y border-line py-16;
+  }
+  .landing-slack > div {
+    @apply max-w-2xl;
+  }
+  .landing-slack > a {
+    @apply shrink-0;
+  }
+  .landing-final {
+    @apply py-20 text-center;
+  }
+  .landing-final > p {
+    @apply mx-auto mb-7 max-w-2xl;
+  }
+  .public-footer {
+    @apply mt-0 flex flex-wrap justify-between gap-6 border-t border-line px-10 py-7 text-xs tracking-normal text-muted;
+  }
+  .public-footer nav {
+    @apply flex flex-wrap gap-5;
+  }
+  .legal-main {
+    @apply mx-auto max-w-3xl px-6 py-16;
+  }
+  .legal-main h1 {
+    @apply mb-6 mt-4 text-5xl tracking-tight;
+  }
+  .legal-main > p,
+  .legal-main section p {
+    @apply text-base leading-8 text-muted;
+  }
+  .legal-main section {
+    @apply mt-10 border-t border-line pt-8;
+  }
+  .legal-main section h2 {
+    @apply mb-4 text-xl text-ink;
+  }
+  .legal-main section .text-link {
+    @apply mr-5 text-sm;
+  }
+  .legal-draft {
+    @apply rounded-lg border border-negative/25 bg-negative/5 p-5 text-sm!;
+  }
+  .legal-facts {
+    @apply mt-6 grid gap-4 text-sm;
+  }
+  .legal-facts dt {
+    @apply mb-1 text-muted;
+  }
+  .legal-facts dd {
+    @apply text-ink;
+  }
+}
+@media (max-width: 1100px) {
+  .landing-hero {
+    @apply gap-10;
+  }
+  .hero-copy h1 {
+    @apply text-5xl;
+  }
+  .hero-preview {
+    @apply p-6;
+  }
+  .landing-split {
+    @apply gap-10;
+  }
+}
+@media (max-width: 760px) {
+  .public-header {
+    @apply px-5 py-5;
+  }
+  .public-header nav {
+    @apply gap-3;
+  }
+  .public-header nav > a:first-child {
+    @apply hidden;
+  }
+  .public-header .button-primary {
+    @apply px-3 text-xs;
+  }
+  .landing-main {
+    @apply px-5;
+  }
+  .landing-hero {
+    @apply grid-cols-1 gap-12 py-14;
+  }
+  .hero-copy h1 {
+    @apply text-5xl;
+  }
+  .hero-description {
+    @apply text-base;
+  }
+  .steps-grid {
+    @apply grid-cols-1 gap-4;
+  }
+  .landing-section {
+    @apply py-14;
+  }
+  .landing-split {
+    @apply grid-cols-1 gap-8 py-14;
+  }
+  .landing-slack {
+    @apply flex-col items-start gap-4;
+  }
+  .section-intro h2,
+  .landing-split h2,
+  .landing-slack h2,
+  .landing-final h2 {
+    @apply text-3xl;
+  }
+  .public-footer {
+    @apply px-5;
+  }
+  .legal-main h1 {
+    @apply text-4xl;
+  }
+}
