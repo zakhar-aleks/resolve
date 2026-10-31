@@ -1,3 +1,9 @@
+import { IntakeController } from './support/intake.controller';
+import { PrivacyService } from './privacy/privacy.service';
+import { PrivacyController } from './privacy/privacy.controller';
+import { SlackService } from './slack/slack.service';
+import { TriageService } from './support/triage.service';
+import { CaseManagementService } from './support/case-management.service';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseOptions } from './database/data-source';
@@ -26,6 +32,8 @@ import { StripeProvider } from './billing/stripe.provider';
     SupportController,
     StateController,
     BillingController,
+    PrivacyController,
+    IntakeController,
   ],
   providers: [
     BootstrapService,
@@ -37,6 +45,10 @@ import { StripeProvider } from './billing/stripe.provider';
     JevProvider,
     BillingService,
     StripeProvider,
+    PrivacyService,
+    SlackService,
+    TriageService,
+    CaseManagementService,
   ],
 })
 export class AppModule {}
