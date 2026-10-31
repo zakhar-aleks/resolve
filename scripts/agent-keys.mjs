@@ -8,7 +8,12 @@ try {
   if (error.code !== 'ENOENT') throw error;
   content = await readFile(new URL('../.env.example', import.meta.url), 'utf8');
 }
-for (const name of ['RESOLVE_API_KEY', 'RESOLVE_REVIEWER_KEY']) {
+for (const name of [
+  'RESOLVE_API_KEY',
+  'RESOLVE_REVIEWER_KEY',
+  'WORKSPACE_PASSWORD',
+  'INTERNAL_API_TOKEN',
+]) {
   const pattern = new RegExp(`^${name}=(.*)$`, 'm');
   const existing = content.match(pattern);
   if (existing?.[1]?.trim()) continue;
@@ -18,5 +23,5 @@ for (const name of ['RESOLVE_API_KEY', 'RESOLVE_REVIEWER_KEY']) {
 await writeFile(path, content, { mode: 0o600 });
 await chmod(path, 0o600);
 console.log(
-  'Agent API credentials are stored in .env. Restart the API server. Read and use them locally; never put them in a browser or commit them.',
+  'Workspace and API credentials are stored in .env. Restart the API server. Read and use them locally; never put them in a browser or commit them.',
 );
