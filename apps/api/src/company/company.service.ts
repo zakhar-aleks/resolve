@@ -1,17 +1,17 @@
 import { In, IsNull } from 'typeorm';
 import { CaseEntity } from '../database/entities/case.entity';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { randomUUID } from 'node:crypto';
-import type { Repository } from 'typeorm';
 import { CompanySchema, type CompanyProfile } from '@resolve/contracts';
 import { CompanyEntity } from '../database/entities/company.entity';
 import { conflict } from '../common/errors';
 @Injectable()
 export class CompanyService {
-  constructor(
-    @InjectRepository(CompanyEntity) private readonly companies: Repository<CompanyEntity>,
-  ) {}
+  constructor(private readonly data: DataSource) {}
+  private get companies() {
+    return this.data.getRepository(CompanyEntity);
+  }
   async get(): Promise<CompanyProfile> {
     return CompanySchema.parse((await this.companies.findOneByOrFail({ id: 1 })).profile);
   }

@@ -1,3 +1,4 @@
+import { workspaceContext } from '../../tenancy/context';
 import {
   Injectable,
   UnauthorizedException,
@@ -18,6 +19,16 @@ function matches(input: string, expected: string): boolean {
 @Injectable()
 export class AgentKeyGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
+    const scoped = workspaceContext.getStore();
+    if (scoped?.apiRole) {
+      const request = context.switchToHttp().getRequest<Request>();
+      const privileged =
+        request.method === 'PUT' ||
+        ['execute', 'reconcile', 'savePolicy', 'promptPreview'].includes(context.getHandler().name);
+      if (privileged && scoped.apiRole !== 'reviewer')
+        throw new UnauthorizedException({ code: 'AGENT_ACCESS_DENIED' });
+      return true;
+    }
     if (
       environment.RESOLVE_API_KEY.length < 32 ||
       environment.RESOLVE_REVIEWER_KEY.length < 32 ||
