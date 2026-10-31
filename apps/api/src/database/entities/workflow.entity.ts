@@ -11,6 +11,7 @@ export class WorkflowEntity {
   @Column('text') privacyRevision!: string;
   @Column('text') resourceVersion!: string;
   @Column('text') planRef!: string;
+  @Column('text', { default: 'legacy' }) promptHash = 'legacy';
   @Column('boolean', { default: false }) dispatchStarted = false;
 }
 @Entity('workflow_settings')

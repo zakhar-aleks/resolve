@@ -1,3 +1,4 @@
+import { PolicyPrompts1793458800000 } from './migrations/policy-prompts';
 import 'reflect-metadata';
 import {
   WorkflowEntity,
@@ -28,7 +29,12 @@ export const databaseOptions = {
     WorkflowSettingsEntity,
     DemoServiceEntity,
   ],
-  migrations: [Initial1793440800000, SupportExperience1793444400000, AgentWorkflows1793451600000],
+  migrations: [
+    Initial1793440800000,
+    SupportExperience1793444400000,
+    AgentWorkflows1793451600000,
+    PolicyPrompts1793458800000,
+  ],
   migrationsRun: true,
   synchronize: false,
   retryAttempts: 1,
