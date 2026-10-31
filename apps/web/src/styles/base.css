@@ -20,7 +20,10 @@
     @apply cursor-pointer;
   }
   button:disabled {
-    @apply cursor-wait opacity-50;
+    @apply cursor-not-allowed opacity-50;
+  }
+  .htmx-request button:disabled {
+    cursor: wait;
   }
   a {
     @apply no-underline;
@@ -43,7 +46,16 @@
   input:not([type='checkbox']):not([type='hidden']):not([type='file']),
   select,
   textarea {
-    @apply mt-2 w-full rounded-md border border-line bg-base px-3 py-2.5 text-xs text-ink outline-none;
+    @apply mt-2 min-h-11 w-full rounded-md border border-line bg-base px-3 py-2.5 text-xs text-ink outline-none;
+  }
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-inline-end: 2.75rem;
+    background-image: url('/icons/chevron-down.svg');
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 1rem;
   }
   textarea {
     @apply min-h-28 resize-y leading-7;
@@ -60,5 +72,13 @@
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
+  }
+}
+@media (forced-colors: active) {
+  select {
+    appearance: auto;
+    -webkit-appearance: auto;
+    background-image: none;
+    padding-inline-end: 0.75rem;
   }
 }

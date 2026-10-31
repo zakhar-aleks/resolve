@@ -87,7 +87,23 @@
     @apply mt-5 border-t border-line pt-5 text-sm;
   }
   details > summary {
-    @apply cursor-pointer text-ink;
+    @apply flex cursor-pointer items-center gap-3 text-ink;
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+  details > summary::before {
+    content: '';
+    inline-size: 0.45rem;
+    block-size: 0.45rem;
+    flex-shrink: 0;
+    border-block-end: 1.5px solid currentColor;
+    border-inline-end: 1.5px solid currentColor;
+    transform: rotate(-45deg);
+  }
+  details[open] > summary::before {
+    transform: rotate(45deg);
   }
   .request-management form {
     @apply mt-5;
@@ -110,6 +126,7 @@
   }
   .check-option input {
     @apply mt-1 size-4 shrink-0 accent-accent;
+    aspect-ratio: 1;
   }
   .check-option small {
     @apply mt-1 block text-xs text-muted;
@@ -133,7 +150,7 @@
     @apply max-w-3xl text-sm leading-7 text-muted;
   }
   .readiness-card {
-    @apply p-5;
+    @apply flex flex-col p-5;
   }
   .readiness-card .card-heading {
     @apply mb-4 flex items-start gap-3;
@@ -148,7 +165,16 @@
     @apply text-sm leading-7 text-muted;
   }
   .readiness-card .form-grid {
-    @apply mt-5 grid-cols-1;
+    @apply mt-auto grid-cols-1;
+  }
+  .readiness-card > .text-link {
+    @apply mb-5;
+  }
+  .readiness-card > .check-option {
+    @apply mb-0;
+  }
+  .privacy-form > button {
+    @apply justify-self-start;
   }
   .readiness-card textarea {
     @apply min-h-20;

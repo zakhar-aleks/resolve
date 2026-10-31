@@ -42,7 +42,7 @@
     @apply border-accent/20 bg-soft text-accent;
   }
   .nav-link span {
-    @apply w-4 text-base;
+    @apply grid size-4 shrink-0 place-items-center text-base;
   }
   .sidebar-bottom {
     @apply mt-auto px-2 pt-4 text-[10px] text-muted;
@@ -91,7 +91,7 @@
   }
   .button-primary,
   .button-secondary {
-    @apply inline-flex min-h-9 items-center justify-center rounded-md border px-3.5 py-2.5 text-xs font-medium;
+    @apply inline-flex min-h-11 items-center justify-center rounded-md border px-3.5 py-2.5 text-xs font-medium;
   }
   .button-primary {
     @apply border-accent bg-accent text-[#211c29];
