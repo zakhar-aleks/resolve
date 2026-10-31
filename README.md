@@ -141,4 +141,10 @@ This is a **local single-company operator MVP**. Customer replies are drafts, an
 
 Create an internal Slack app using `integrations/slack-manifest.yml`, install it in the intended workspace, and generate an app-level token with `connections:write`. Set `SLACK_APP_TOKEN`, `SLACK_TEAM_ID`, and comma-separated `SLACK_CHANNEL_IDS` on the backend and restart it. Invite the app to each approved channel. Mention `@Resolve` with a support request; add `#human-only` to disable external AI for it.
 
-The official Socket Mode SDK receives mentions without a public webhook. Workspace/channel allowlists, bot rejection and a unique event identity prevent unintended intake and duplicate cases. Events are acknowledged after durable insertion. Mentions do not establish account ownership or permit payment actions. No outbound Slack messages are sent. This adapter needs real Slack credentials for a live connection test; the demo runs without them.
+The official Socket Mode SDK receives mentions without a public webhook. Workspace/channel allowlists, bot rejection and a unique event identity prevent unintended intake and duplicate cases. Events are acknowledged after durable insertion. Mentions do not establish account ownership or permit payment actions. Optional SLACK_BOT_TOKEN enables threaded acknowledgements without echoing customer text. This adapter needs real Slack credentials for a live connection test; the demo runs without them.
+
+## Six non-payment actions and Agent API
+
+Open `/?view=workflows` for delivery address changes, returns/replacements, appointment changes, account recovery, notification preferences and reviewed privacy requests. All six change durable fictional service records with policy/evidence checks and explicit approval. They are not pretend receipts for real services.
+
+Run `npm run agent:keys`, restart the API, and use `/api/v1/agent` with separate intake and reviewer Bearer credentials. `GET /schema` supplies OpenAPI 3.1. The optional HTTPS company connector provides live execution and read-only reconciliation. See [the API, service connector, and Slack guide](docs/agent-api.md) for schemas, examples, permissions and deployment requirements. Slack mentions now identify these workflows; an optional bot token enables a threaded acknowledgement.

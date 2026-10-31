@@ -34,7 +34,7 @@ Present the company’s notice at collection, minimise fields, discourage sensit
 
 ## Actions beyond payments
 
-These are proposed adapters and workflows, not current integration capabilities.
+Update: all six requested action categories now have implemented demo workflows and an authenticated Agent API with a company connector contract. The table below remains a guide to the required real-service boundaries; see [Agent API](agent-api.md).
 
 | Area                | Customer problem                 | Agent action                                                                 | Required boundary                                                                              |
 | ------------------- | -------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -54,7 +54,7 @@ Recommended next vertical: order address changes and replacement requests. They 
 
 Each action declares its input/result schema, required connection scope, evidence, company policy, approval rule, and verification method. The lifecycle is: understand → verify ownership/evidence → prepare a concrete change → obtain required approval → execute once → read back the result → record the outcome. Use idempotency where supported; otherwise use a durable operation identity, concurrency controls and provider-specific reconciliation. A timeout means unknown until reconciled, never permission to repeat a write blindly.
 
-Current implementation already provides local tagging, ownership, request states, summaries, and human-only preferences. It also supports simulated billing operations and an optional Stripe test adapter. External replies remain drafts; Slack currently provides inbound mentions only. All proposed order, identity, booking, document-delivery and rights-processing actions require new adapters and tests.
+Current implementation already provides local tagging, ownership, request states, summaries, and human-only preferences. It also supports simulated billing operations and an optional Stripe test adapter. External replies remain drafts; Slack currently provides inbound mentions only. Order, identity, booking and rights-request demo workflows are now implemented and tested. Their real service adapters require a company connector; document delivery is still proposed.
 
 ## Official reference
 
