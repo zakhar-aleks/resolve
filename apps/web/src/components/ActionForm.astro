@@ -1,0 +1,26 @@
+---
+import { ROUTES } from '../consts/routes';
+interface Props {
+  action: string;
+  view?: string;
+  caseId?: string;
+  class?: string;
+}
+const { action, view = 'support', caseId, class: className } = Astro.props;
+const target = `${ROUTES.actions}/${action}`;
+---
+
+<form
+  method="post"
+  action={target}
+  hx-post={target}
+  hx-target="#workspace"
+  hx-swap="innerHTML"
+  hx-disabled-elt="find button[type=submit]"
+  hx-indicator="#request-indicator"
+  class={className}
+>
+  <input type="hidden" name="view" value={view} />
+  {caseId && <input type="hidden" name="caseId" value={caseId} />}
+  <slot />
+</form>

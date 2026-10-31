@@ -1,0 +1,185 @@
+---
+import { copyText } from '../helpers/copy';
+import type { CompanyProfile } from '@resolve/contracts';
+import { COPY } from '../consts/copy';
+import ActionForm from './ActionForm.astro';
+import PageHeading from './PageHeading.astro';
+import Toggle from './Toggle.astro';
+interface Props {
+  company: CompanyProfile;
+}
+const { company } = Astro.props;
+const text = COPY.company;
+---
+
+<PageHeading
+  eyebrow={text.eyebrow}
+  title={text.title}
+  description={text.description}
+  badge={text.scope}
+/>
+<ActionForm action="company" view="company" class="settings-grid">
+  <input type="hidden" name="revision" value={company.revision} />
+  <div class="settings-main">
+    <section class="panel settings-card">
+      <div class="card-heading"><h2>{text.identity}</h2><p>{text.identityDescription}</p></div>
+      <div class="form-grid">
+        <label
+          >{text.companyName}<input
+            name="companyName"
+            value={company.companyName}
+            maxlength="80"
+            required
+            placeholder={COPY.placeholders.company}
+          /></label
+        ><label
+          >{text.agentName}<input
+            name="agentName"
+            value={company.agentName}
+            maxlength="60"
+            required
+            placeholder={COPY.placeholders.agent}
+          /></label
+        ><label
+          >{text.tone}<select name="tone"
+            >{
+              Object.entries(COPY.tones).map(([value, label]) => (
+                <option value={value} selected={value === company.tone}>
+                  {label}
+                </option>
+              ))
+            }</select
+          ></label
+        ><label
+          >{text.contact}<input
+            name="escalationEmail"
+            type="email"
+            value={company.escalationEmail}
+            maxlength="160"
+            placeholder={COPY.placeholders.email}
+          /></label
+        >
+      </div>
+      <label
+        >{text.context}<textarea
+          name="context"
+          maxlength="4000"
+          placeholder={COPY.placeholders.context}>{company.context}</textarea
+        ></label
+      ><p class="field-note">{text.contactNote}</p>
+    </section>
+    <section class="panel settings-card">
+      <div class="card-heading"><h2>{text.knowledge}</h2><p>{text.knowledgeDescription}</p></div>
+      <label
+        >{text.document}<textarea
+          name="writtenPolicy"
+          id="policy-document"
+          class="policy-editor"
+          maxlength="10000"
+          placeholder={COPY.placeholders.policy}>{company.writtenPolicy}</textarea
+        ></label
+      >
+      <div class="import-row">
+        <label class="file-button"
+          >{text.import}<input
+            data-policy-file
+            type="file"
+            accept=".txt,.md,text/plain,text/markdown"
+          /></label
+        ><span class="subtle" data-policy-length
+          >{copyText.characters(company.writtenPolicy.length)}</span
+        >
+      </div><p class="inline-note">{text.writtenBoundary}</p><p
+        data-file-error
+        class="error-message"
+        role="alert"
+      >
+      </p>
+    </section>
+    <section class="panel settings-card">
+      <div class="card-heading">
+        <h2>{text.permissions}</h2><p>{text.permissionsDescription}</p>
+      </div>
+      <div class="form-grid">
+        <label
+          >{text.window}<input
+            type="number"
+            name="refundWindowDays"
+            min="0"
+            max="365"
+            value={company.refundWindowDays}
+            required
+          /></label
+        ><label
+          >{text.limit}<input
+            type="number"
+            name="maximumPayment"
+            min="0"
+            max="10000"
+            step="0.01"
+            value={(company.maximumPaymentCents / 100).toFixed(2)}
+            required
+          /></label
+        >
+      </div>
+      <Toggle
+        name="refundsEnabled"
+        label={text.refunds}
+        description={text.refundsNote}
+        checked={company.refundsEnabled}
+      /><Toggle
+        name="duplicateOnly"
+        label={text.duplicates}
+        description={text.duplicatesNote}
+        checked={company.duplicateOnly}
+      /><Toggle
+        name="cancellationsEnabled"
+        label={text.cancellation}
+        description={text.cancellationNote}
+        checked={company.cancellationsEnabled}
+      /><Toggle
+        name="reviewAll"
+        label={text.reviewAll}
+        description={text.reviewAllNote}
+        checked={company.reviewAll}
+      />
+    </section>
+    <section class="panel settings-card">
+      <div class="card-heading"><h2>{text.engine}</h2><p>{text.engineDescription}</p></div><label
+        >{text.judgment}<select name="decisionEngine"
+          >{
+            Object.entries(COPY.engines).map(([value, label]) => (
+              <option value={value} selected={value === company.decisionEngine}>
+                {label}
+              </option>
+            ))
+          }</select
+        ></label
+      ><label
+        >{text.threshold}<input
+          name="jevConfidenceThreshold"
+          type="number"
+          min="0.5"
+          max="1"
+          step="0.05"
+          value={company.jevConfidenceThreshold}
+        /></label
+      ><p class="field-note">{text.thresholdNote}</p>
+    </section>
+  </div>
+  <aside class="panel settings-summary">
+    <p class="eyebrow">{text.preview}</p><div class="company-preview-mark">
+      {company.companyName.slice(0, 1).toUpperCase()}
+    </div><h2>{company.companyName}</h2><p>
+      {company.agentName}{COPY.separators.dot}{COPY.tones[company.tone]}
+    </p><div class="divider"></div><div class="summary-line">
+      <span>{text.currency}</span><b>{text.currencyValue}</b>
+    </div><div class="summary-line">
+      <span>{text.execution}</span><b>{text.executionValue}</b>
+    </div><div class="summary-line"><span>{text.storage}</span><b>{text.storageValue}</b></div><p
+      class="field-note"
+    >
+      {text.revisionNote}
+    </p><button class="button-primary full-width" type="submit">{text.save}</button>
+  </aside>
+</ActionForm>
