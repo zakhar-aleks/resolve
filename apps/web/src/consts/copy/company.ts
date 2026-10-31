@@ -31,6 +31,22 @@ export const COMPANY_COPY = {
     cancellationNote: 'Schedule cancellation at period end in the simulator.',
     reviewAll: 'Review every action',
     reviewAllNote: 'Prepare recommendations without authorizing billing changes.',
+    routing: 'Handling complex requests',
+    routingNote:
+      'External AI preferences always take priority. Larger-model routing requires an administrator-configured model; otherwise complex requests go to your team.',
+    routingModes: {
+      small_only: 'Standard assistance · complex requests go to your team',
+      adaptive: 'Use the configured larger model for complex requests',
+    },
+    promptTitle: 'Your agent’s instructions',
+    promptBody:
+      'The saved instructions combine polite support, privacy and security with your current company policies. They update automatically after policy changes. Unsaved edits are not included.',
+    promptDetails: 'Read the current instructions',
+    promptVersion: 'Foundation version',
+    companyVersion: 'Company policy version',
+    actionsVersion: 'Action permissions version',
+    privacyVersion: 'Privacy settings version',
+    promptAria: 'Current saved agent system instructions',
     engine: 'Decision engine',
     engineDescription: 'Jev is optional. You can build and demo without paid Jev credits.',
     judgment: 'Judgment mode',

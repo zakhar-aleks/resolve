@@ -1,14 +1,16 @@
 ---
 import { copyText } from '../helpers/copy';
-import type { CompanyProfile } from '@resolve/contracts';
+import AgentPromptPreview from './AgentPromptPreview.astro';
+import type { CompanyProfile, PromptPreview } from '@resolve/contracts';
 import { COPY } from '../consts/copy';
 import ActionForm from './ActionForm.astro';
 import PageHeading from './PageHeading.astro';
 import Toggle from './Toggle.astro';
 interface Props {
   company: CompanyProfile;
+  prompt?: PromptPreview | undefined;
 }
-const { company } = Astro.props;
+const { company, prompt } = Astro.props;
 const text = COPY.company;
 ---
 
@@ -164,8 +166,19 @@ const text = COPY.company;
           step="0.05"
           value={company.jevConfidenceThreshold}
         /></label
-      ><p class="field-note">{text.thresholdNote}</p>
+      ><p class="field-note">{text.thresholdNote}</p><label
+        >{text.routing}<select name="routingMode"
+          >{
+            Object.entries(text.routingModes).map(([value, label]) => (
+              <option value={value} selected={value === company.routingMode}>
+                {label}
+              </option>
+            ))
+          }</select
+        ></label
+      ><p class="field-note">{text.routingNote}</p>
     </section>
+    {prompt && <AgentPromptPreview prompt={prompt} />}
   </div>
   <aside class="panel settings-summary">
     <p class="eyebrow">{text.preview}</p><div class="company-preview-mark">

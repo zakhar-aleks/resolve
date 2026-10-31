@@ -24,6 +24,7 @@ export function cents(value: string): number {
 }
 export function companyForm(form: FormData): CompanyProfile {
   return CompanyInputSchema.parse({
+    routingMode: text(form, 'routingMode') || 'small_only',
     companyName: text(form, 'companyName'),
     agentName: text(form, 'agentName'),
     tone: text(form, 'tone'),
