@@ -80,6 +80,25 @@ const text = COPY.product;
         }
       </div>
     </section>
+    <section class="landing-section">
+      <div class="section-intro">
+        <h2>{text.actionsTitle}</h2><p>{text.actionsBody}</p><a
+          class="text-link"
+          href="/?view=workflows">{text.actionsLink}</a
+        >
+      </div><div class="steps-grid">
+        {
+          Object.values(COPY.workflows.kinds).map((action) => (
+            <article>
+              <>
+                <h3>{action.title}</h3>
+                <p>{action.body}</p>
+              </>
+            </article>
+          ))
+        }
+      </div>
+    </section>
     <section class="landing-slack">
       <div><h2>{text.slackTitle}</h2><p>{text.slackBody}</p></div><a
         href="/?view=connections"

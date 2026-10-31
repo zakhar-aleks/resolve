@@ -11,13 +11,17 @@ export const PRODUCT_COPY = {
     trust: ['External AI off by default', 'Human-only support choices', 'GDPR readiness checklist'],
     previewLabel: 'YOUR TEAM’S NEXT REQUEST',
     previewName: 'Maya Chen',
-    previewSubject: 'A duplicate payment, already understood.',
+    previewSubject: 'A new address, checked before dispatch.',
     previewSummary:
-      'Maya was charged twice for the same subscription. The extra payment is eligible for a refund.',
-    previewTag: 'Billing',
+      'Maya needs her order sent to a new address. Verify ownership and confirm it has not shipped before making the change.',
+    previewTag: 'Orders',
     previewState: 'Ready for review',
-    previewAction: 'Review refund',
+    previewAction: 'Review address change',
     previewGuidance: 'Checked against your company’s policy',
+    actionsTitle: 'Useful help, beyond the payment.',
+    actionsBody:
+      'From delivery changes to account access, prepare the right checks and a clear next step. Try all six workflows with fictional records, or connect your own services through the API.',
+    actionsLink: 'Explore support actions',
     howTitle: 'From a message to a resolution.',
     howDescription: 'One place for the question, the context, and the action that puts it right.',
     steps: [
@@ -52,7 +56,7 @@ export const PRODUCT_COPY = {
     ],
     finalTitle: 'Give every request a clear next step.',
     finalBody:
-      'Try the demonstration workspace. Billing actions use test records until your company connects its services.',
+      'Try orders, bookings, account preferences and privacy requests with demonstration records. Connected services require your company’s setup and permission.',
     footer: 'Thoughtful support. Clear accountability.',
     terms: 'Terms of use',
     notice: 'Privacy notice',

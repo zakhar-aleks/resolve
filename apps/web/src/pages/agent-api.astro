@@ -1,0 +1,43 @@
+---
+import { COPY } from '../consts/copy';
+import AppLayout from '../layouts/AppLayout.astro';
+import PublicHeader from '../components/PublicHeader.astro';
+import PublicFooter from '../components/PublicFooter.astro';
+const text = COPY.agentApi;
+---
+
+<AppLayout
+  ><div class="public-site">
+    <PublicHeader /><main class="legal-main">
+      <p class="eyebrow">{text.eyebrow}</p><h1>{text.title}</h1><p>{text.description}</p><a
+        class="button-primary"
+        href="/?view=workflows">{text.demo}</a
+      ><section>
+        <h2>{text.authenticationTitle}</h2><p>{text.authenticationBody}</p>
+      </section><section><h2>{text.baseTitle}</h2><code>{text.base}</code></section><section>
+        <h2>{text.flowTitle}</h2><p>{text.flowBody}</p>
+      </section><section>
+        <h2>{text.routesTitle}</h2><dl class="workflow-records">
+          {
+            text.routes.map((route) => (
+              <div>
+                <>
+                  <dt>
+                    <code>
+                      {route.method}
+                      {COPY.separators.dot}
+                      {route.path}
+                    </code>
+                  </dt>
+                  <dd>{route.purpose}</dd>
+                </>
+              </div>
+            ))
+          }
+        </dl>
+      </section><section><h2>{text.liveTitle}</h2><p>{text.liveBody}</p></section><section>
+        <h2>{text.slackTitle}</h2><p>{text.slackBody}</p>
+      </section><section><h2>{text.deploymentTitle}</h2><p>{text.deploymentBody}</p></section>
+    </main><PublicFooter />
+  </div></AppLayout
+>
