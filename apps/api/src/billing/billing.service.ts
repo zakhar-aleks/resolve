@@ -1,5 +1,6 @@
 import { serializeOperation } from './mappers/operation.mapper';
 import { receiptState } from './domain/receipt-state';
+import { PrivacyEntity } from '../database/entities/privacy.entity';
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { In, type EntityManager } from 'typeorm';
@@ -48,6 +49,10 @@ export class BillingService {
         where: { id: 1 },
         lock: { mode: 'pessimistic_read' },
       });
+      const privacy = await manager.findOneOrFail(PrivacyEntity, {
+        where: { id: 1 },
+        lock: { mode: 'pessimistic_read' },
+      });
       const locked = await manager.findOneOrFail(CaseEntity, {
         where: { id: run.caseId },
         lock: { mode: 'pessimistic_write' },
@@ -55,6 +60,9 @@ export class BillingService {
       const previous = await manager.findOneBy(OperationEntity, { runId });
       if (previous) return { operation: serializeOperation(previous), dispatch: false };
       const record = remote ?? locked;
+      if (run.result.privacyRevision !== privacy.profile.revision) conflict('POLICY_CHANGED');
+      if (locked.aiPreference === 'human_only' && run.result.analysis.source !== 'rules')
+        conflict('POLICY_CHANGED');
       const failure = approvalFailure(run.result, company.profile, record, new Date());
       if (failure) conflict(failure);
       const unresolved = await manager.findOneBy(OperationEntity, {
@@ -91,6 +99,12 @@ export class BillingService {
         lock: { mode: 'pessimistic_write' },
       });
       if (TERMINAL.includes(op.state)) return serializeOperation(op);
+      if (state === 'succeeded')
+        await manager.update(
+          CaseEntity,
+          { id: op.caseId },
+          { status: 'resolved', closedAt: new Date().toISOString() },
+        );
       op.state = state;
       op.receipt = receipt;
       await manager.save(op);
@@ -127,6 +141,11 @@ export class BillingService {
           amountCents: op.action === 'refund' ? op.amountCents : null,
         };
         entity.state = record.id === 'timeout' ? 'unknown' : 'succeeded';
+        if (entity.state === 'succeeded') {
+          record.status = 'resolved';
+          record.closedAt = new Date().toISOString();
+          await manager.save(record);
+        }
         await manager.save(entity);
         await this.event(
           manager,
