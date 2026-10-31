@@ -4,6 +4,7 @@ import { COPY } from '../consts/copy';
 import Sidebar from './Sidebar.astro';
 import SupportInbox from './SupportInbox.astro';
 import CompanySettings from './CompanySettings.astro';
+import PrivacyCenter from './PrivacyCenter.astro';
 import Connections from './Connections.astro';
 interface Props {
   model: WorkspaceModel;
@@ -37,9 +38,15 @@ const { model } = Astro.props;
         <SupportInbox model={model} />
       ) : model.view === 'company' ? (
         <CompanySettings company={model.state.company} />
+      ) : model.view === 'privacy' ? (
+        <PrivacyCenter profile={model.state.privacy} />
       ) : (
-        <Connections connections={model.state.connections} />
+        <Connections connections={model.state.connections} slack={model.state.slack} />
       )
-    }<footer><span>{COPY.shell.footer}</span><span>{COPY.shell.footerDetail}</span></footer>
+    }<footer>
+      <span>{COPY.shell.footer}</span><a href="/privacy-policy">{COPY.product.notice}</a><a
+        href="/terms">{COPY.product.terms}</a
+      >
+    </footer>
   </main>
 </div>

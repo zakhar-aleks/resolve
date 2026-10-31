@@ -1,0 +1,135 @@
+---
+import type { PrivacyProfile } from '@resolve/contracts';
+import { COPY } from '../consts/copy';
+import { privacyPresentation } from '../services/privacy-view';
+import ActionForm from './ActionForm.astro';
+import PageHeading from './PageHeading.astro';
+import Toggle from './Toggle.astro';
+interface Props {
+  profile: PrivacyProfile;
+}
+const { profile } = Astro.props;
+const text = COPY.privacy;
+const view = privacyPresentation(profile);
+---
+
+<PageHeading eyebrow={text.eyebrow} title={text.title} description={text.description} />
+<div class="privacy-intro">
+  <p>{text.boundary}</p><p>{text.global}</p><a href="/privacy-policy" class="text-link"
+    >{text.noticeLink}</a
+  >
+</div>
+<ActionForm action="privacy" view="privacy" class="privacy-form">
+  <input type="hidden" name="revision" value={profile.revision} />
+  <section class="panel settings-card">
+    <div class="card-heading"><h2>{text.identity}</h2></div><div class="form-grid">
+      <label
+        >{text.legalName}<input name="legalName" value={profile.legalName} maxlength="180" /></label
+      >
+      <label
+        >{text.email}<input name="privacyEmail" type="email" value={profile.privacyEmail} /></label
+      >
+      <label
+        >{text.region}<select name="businessRegion"
+          ><option value="eea" selected={profile.businessRegion === 'eea'}>{text.eea}</option
+          ><option value="international" selected={profile.businessRegion === 'international'}
+            >{text.international}</option
+          ></select
+        ></label
+      >
+      <label
+        >{text.basis}<select name="lawfulBasis"
+          >{
+            Object.entries(text.bases).map(([value, label]) => (
+              <option value={value} selected={value === profile.lawfulBasis}>
+                {label}
+              </option>
+            ))
+          }</select
+        ></label
+      >
+    </div><label
+      >{text.address}<textarea name="address" maxlength="500">{profile.address}</textarea></label
+    ><label
+      >{text.hosting}<input
+        name="hostingLocation"
+        value={profile.hostingLocation}
+        maxlength="250"
+      /></label
+    ><p class="field-note">{text.hostingHint}</p>
+  </section>
+  <section class="panel settings-card">
+    <div class="card-heading"><h2>{text.processing}</h2></div><Toggle
+      name="aiEnabled"
+      label={text.ai}
+      description={text.aiNote}
+      checked={profile.aiEnabled}
+    /><Toggle
+      name="redactBeforeAi"
+      label={text.redaction}
+      description={text.redactionNote}
+      checked={profile.redactBeforeAi}
+    /><p class="inline-note">{text.preference}</p><label
+      >{text.retention}<input
+        name="retentionDays"
+        type="number"
+        min="7"
+        max="365"
+        value={profile.retentionDays}
+        required
+      /></label
+    ><p class="field-note">{text.retentionNote}</p>
+  </section>
+  <section class="readiness-heading">
+    <p class="eyebrow">{view.progress}</p><h2>{text.checklist}</h2><p>{text.checklistBody}</p>
+  </section>
+  <div class="privacy-checklist">
+    {
+      profile.tasks.map((task, index) => (
+        <section class="panel readiness-card">
+          <>
+            <div class="card-heading">
+              <>
+                <span class="readiness-number">{String(index + 1).padStart(2, '0')}</span>
+                <h3>{COPY.privacyTasks[task.id].title}</h3>
+              </>
+            </div>
+            <p>{COPY.privacyTasks[task.id].action}</p>
+            <a
+              href={COPY.privacyTasks[task.id].link}
+              target="_blank"
+              rel="noreferrer"
+              class="text-link"
+            >
+              {text.sources}
+            </a>
+            <div class="form-grid">
+              <>
+                <label>
+                  {text.owner}
+                  <input name={`${task.id}.owner`} value={task.owner} maxlength="100" />
+                </label>
+                <label>
+                  {text.evidence}
+                  <textarea
+                    name={`${task.id}.evidence`}
+                    maxlength="1500"
+                    set:text={task.evidence}
+                  />
+                </label>
+              </>
+            </div>
+            <label class="check-option">
+              <input name={`${task.id}.confirmed`} type="checkbox" checked={task.confirmed} />
+              {text.confirmed}
+            </label>
+          </>
+        </section>
+      ))
+    }
+  </div>
+  <div class="privacy-launch"><h2>{text.launchTitle}</h2><p>{text.launchBody}</p></div><button
+    type="submit"
+    class="button-primary">{text.save}</button
+  >
+</ActionForm>
