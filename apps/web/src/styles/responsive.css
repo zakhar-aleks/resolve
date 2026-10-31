@@ -1,0 +1,152 @@
+@media (max-width: 1180px) {
+  .work-grid {
+    grid-template-columns: 200px minmax(280px, 1fr);
+  }
+  .decision {
+    grid-column: 1 / -1;
+  }
+  .decision-body {
+    @apply grid grid-cols-3 gap-x-5;
+  }
+  .decision-body > .eyebrow,
+  .recommendation,
+  .decision-body > .subtle,
+  .decision-body > .divider,
+  .section-label,
+  .checks,
+  .policy-note {
+    grid-column: 1/-1;
+  }
+  .checks {
+    @apply grid grid-cols-3 gap-x-4;
+  }
+  .metrics small {
+    @apply col-span-2;
+  }
+  .settings-grid {
+    grid-template-columns: minmax(300px, 1fr) 240px;
+  }
+  .agent-label .subtle {
+    @apply hidden;
+  }
+}
+@media (max-width: 960px) {
+  .sidebar {
+    @apply w-44 px-3;
+  }
+  .workspace-shell {
+    @apply ml-44;
+  }
+  main {
+    @apply px-5;
+  }
+  .topbar {
+    @apply px-5;
+  }
+  .header-status {
+    @apply hidden;
+  }
+  .settings-grid,
+  .connections-grid {
+    @apply grid-cols-1;
+  }
+  .settings-summary {
+    @apply static;
+  }
+  .work-grid {
+    grid-template-columns: 180px minmax(250px, 1fr);
+  }
+  .metrics > div {
+    @apply px-3;
+  }
+}
+@media (max-width: 720px) {
+  .sidebar {
+    @apply relative inset-auto block w-auto border-b border-r-0 px-4 py-4;
+  }
+  .brand {
+    @apply mx-0 mb-4 inline-block text-xl;
+  }
+  .sidebar-company,
+  .nav-caption,
+  .sidebar-bottom {
+    @apply hidden;
+  }
+  .sidebar nav {
+    @apply flex;
+  }
+  .nav-link {
+    @apply flex-1 justify-center gap-1.5 px-1.5 py-2 text-[10px];
+  }
+  .nav-link span {
+    @apply w-auto text-xs;
+  }
+  .workspace-shell {
+    @apply ml-0;
+  }
+  .topbar {
+    @apply h-12 px-4;
+  }
+  main {
+    @apply px-4 py-6;
+  }
+  .page-heading {
+    @apply items-start gap-3;
+  }
+  .page-heading h1 {
+    @apply text-2xl;
+  }
+  .page-heading > .badge {
+    @apply hidden;
+  }
+  .page-heading > button {
+    @apply mt-6 whitespace-nowrap px-2 text-[10px];
+  }
+  .metrics {
+    @apply grid-cols-2 gap-y-5;
+  }
+  .metrics > div:nth-child(3) {
+    @apply pl-0;
+  }
+  .metrics > div:nth-child(2) {
+    @apply border-0;
+  }
+  .work-grid {
+    @apply block;
+  }
+  .work-grid > .panel {
+    @apply mb-4;
+  }
+  .case-list {
+    @apply flex overflow-x-auto;
+  }
+  .case-link {
+    @apply min-w-48 border-b-0;
+  }
+  .inbox-footer {
+    @apply hidden;
+  }
+  .decision-body {
+    @apply block;
+  }
+  .checks {
+    @apply block;
+  }
+  .event {
+    grid-template-columns: 70px 1fr;
+  }
+  .event p {
+    @apply col-span-2;
+  }
+  .event time,
+  .ledger .panel-heading > .subtle {
+    @apply hidden;
+  }
+  .settings-card,
+  .settings-summary {
+    @apply p-5;
+  }
+  .settings-grid {
+    @apply gap-5;
+  }
+}

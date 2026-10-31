@@ -1,0 +1,8 @@
+@import 'tailwindcss';
+@import './theme.css';
+@import './base.css';
+@import './shell.css';
+@import './support.css';
+@import './settings.css';
+@import './feedback.css';
+@import './responsive.css';
