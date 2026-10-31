@@ -1,3 +1,8 @@
+import { WorkflowService } from './workflows/workflow.service';
+import { WorkflowBootstrapService } from './workflows/workflow-bootstrap.service';
+import { WorkflowController, AgentController } from './workflows/workflow.controller';
+import { ConnectorProvider } from './workflows/providers/connector.provider';
+import { AgentKeyGuard } from './workflows/guards/agent-key.guard';
 import { IntakeController } from './support/intake.controller';
 import { PrivacyService } from './privacy/privacy.service';
 import { PrivacyController } from './privacy/privacy.controller';
@@ -34,6 +39,8 @@ import { StripeProvider } from './billing/stripe.provider';
     BillingController,
     PrivacyController,
     IntakeController,
+    WorkflowController,
+    AgentController,
   ],
   providers: [
     BootstrapService,
@@ -49,6 +56,10 @@ import { StripeProvider } from './billing/stripe.provider';
     SlackService,
     TriageService,
     CaseManagementService,
+    WorkflowService,
+    WorkflowBootstrapService,
+    ConnectorProvider,
+    AgentKeyGuard,
   ],
 })
 export class AppModule {}
