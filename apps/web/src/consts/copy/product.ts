@@ -4,7 +4,7 @@ export const PRODUCT_COPY = {
     headline: 'Resolve the request.\nRespect the person.',
     description:
       'Help customers with clear summaries and practical next steps, while keeping their data in mind. Privacy controls and GDPR readiness are part of your team’s everyday support.',
-    open: 'Open your workspace',
+    open: 'Create your company workspace',
     learn: 'See how it works',
     privacy: 'Privacy & data',
     home: 'Home',
@@ -44,9 +44,9 @@ export const PRODUCT_COPY = {
     privacyLink: 'Explore privacy controls',
     privacyBoundary:
       'Built-in controls support your privacy work. Compliance also depends on your company’s contracts, deployment, and operating procedures.',
-    slackTitle: 'Meet your team where they already work.',
+    slackTitle: 'Connect Slack and the services your team uses.',
     slackBody:
-      'Mention Resolve in a connected Slack channel to bring a request into the inbox. Tags, ownership, and a prepared summary keep everyone aligned.',
+      'Mention Resolve in an approved Slack channel to bring requests into one inbox. Connect order, booking, identity and preference services through a secure API, with ownership checks and approval before changes.',
     slackSetup:
       'Your administrator connects Slack using an app token, a workspace ID, and approved channel IDs. Add the app to those channels and mention it to create a request. Add #human-only to keep a request out of external AI.',
     principles: [
