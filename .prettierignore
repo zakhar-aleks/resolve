@@ -5,3 +5,4 @@ node_modules
 package-lock.json
 *.png
 *.sqlite3*
+node_modules.previous
