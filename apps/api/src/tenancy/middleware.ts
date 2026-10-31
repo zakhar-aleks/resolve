@@ -35,6 +35,7 @@ export function tenantBoundary(auth: AuthService, registry: WorkspaceRegistry) {
         response.status(401).json({ code: 'SESSION_REQUIRED' });
         return;
       }
+      if(!context&&environment.PUBLIC_DEMO==='true'&&!['GET','HEAD','OPTIONS'].includes(request.method)&&/^\/api\/(company|privacy|connections)(\/|$)/u.test(path)){response.status(403).json({code:'PUBLIC_DEMO_SETTINGS_LOCKED'});return;}
       if (!context) {
         next();
         return;

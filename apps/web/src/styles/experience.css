@@ -220,3 +220,5 @@
     @apply col-span-1;
   }
 }
+
+.public-demo-banner { padding: 12px 24px; background: #2c2834; color: #f1f0f5; font-size: 14px; line-height: 1.6; }

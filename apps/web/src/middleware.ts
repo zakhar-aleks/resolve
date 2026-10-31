@@ -35,6 +35,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     !sameOriginWrite(context.request, origin)
   )
     response = new Response(SECURITY_COPY.rejected, { status: 403 });
+  else if(serverEnvironment('PUBLIC_DEMO')==='true'&&!token&&(path==='/'||path==='/fragments/workspace'||path==='/request-support'||path==='/agent-api'||path.startsWith('/actions/')))response=await next();
   else if (publicRoute(context.url) || authRoute) response = await next();
   else if (
     serverEnvironment('ALLOW_BASIC_AUTH') === 'true' &&

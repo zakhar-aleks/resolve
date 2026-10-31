@@ -9,6 +9,7 @@ const schema = z.object({
     .string()
     .regex(/^(?:[a-fA-F0-9]{64})?$/u)
     .default(''),
+  PUBLIC_DEMO: z.enum(['true','false']).default('false'),
   MAX_WORKSPACES: z.coerce.number().int().min(1).max(1000).default(50),
   DATABASE_SSL: z.enum(['true', 'false']).default('false'),
   DATABASE_CA_CERT: z.string().default(''),

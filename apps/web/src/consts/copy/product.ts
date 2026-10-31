@@ -77,6 +77,7 @@ export const PRODUCT_COPY = {
     submit: 'Send request',
   },
   experience: {
+    publicDemo:'Public demo · Fictional records only. Anything entered here is visible to other visitors. Company settings and connection credentials are locked.',
     connected: 'Connected',
     notConnected: 'Not connected',
     connectionIssue: 'Connection needs attention',

@@ -1,4 +1,5 @@
 ---
+import { serverEnvironment } from '../wrappers/server-environment';
 import type { WorkspaceModel } from '../types/workspace';
 import { COPY } from '../consts/copy';
 import Sidebar from './Sidebar.astro';
@@ -12,6 +13,8 @@ interface Props {
 }
 const { model } = Astro.props;
 ---
+{serverEnvironment('PUBLIC_DEMO')==='true'&&<div class="public-demo-banner">{COPY.experience.publicDemo}</div>}
+
 
 <Sidebar companyName={model.state.company.companyName} view={model.view} />
 <div class="workspace-shell">
