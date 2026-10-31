@@ -1,3 +1,5 @@
+import { workflowForm, workflowPolicyForm } from '../helpers/workflow-forms';
+import { DEMO_WORKFLOW } from '../consts/workflows';
 import { COPY } from '../consts/copy';
 import {
   companyForm,
@@ -20,6 +22,32 @@ export async function handleAction(action: string, form: FormData): Promise<Work
   };
   try {
     switch (action) {
+      case 'prepare-workflow':
+        await supportApi.prepareWorkflow(workflowForm(form));
+        selection.view = 'workflows';
+        selection.notice = { kind: 'success', message: COPY.workflows.requestSaved };
+        break;
+      case 'confirm-workflow':
+        await supportApi.confirmWorkflow(
+          text(form, 'workflowId'),
+          text(form, 'planHash'),
+          DEMO_WORKFLOW.verificationToken,
+        );
+        selection.view = 'workflows';
+        break;
+      case 'execute-workflow':
+        await supportApi.executeWorkflow(text(form, 'workflowId'), text(form, 'planHash'));
+        selection.view = 'workflows';
+        break;
+      case 'reconcile-workflow':
+        await supportApi.reconcileWorkflow(text(form, 'workflowId'));
+        selection.view = 'workflows';
+        break;
+      case 'workflow-policy':
+        await supportApi.saveWorkflowPolicy(workflowPolicyForm(form));
+        selection.view = 'workflows';
+        selection.notice = { kind: 'success', message: COPY.workflows.policySaved };
+        break;
       case 'privacy':
         await supportApi.savePrivacy(privacyForm(form));
         selection.view = 'privacy';

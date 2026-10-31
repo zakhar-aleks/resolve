@@ -1,4 +1,10 @@
 import {
+  WorkflowSchema,
+  WorkflowPolicySchema,
+  type WorkflowCreate,
+  type WorkflowPolicy,
+} from '@resolve/contracts';
+import {
   StateSchema,
   PrivacyProfileSchema,
   PrivacyNoticeSchema,
@@ -18,6 +24,26 @@ import {
 } from '@resolve/contracts';
 import { apiRequest } from '../wrappers/api-client';
 export const supportApi = {
+  prepareWorkflow: (input: WorkflowCreate) =>
+    apiRequest('/workflows/requests', WorkflowSchema, 'POST', input),
+  confirmWorkflow: (id: string, planHash: string, verificationToken: string) =>
+    apiRequest(`/workflows/requests/${encodeURIComponent(id)}/confirm`, WorkflowSchema, 'POST', {
+      planHash,
+      verificationToken,
+    }),
+  executeWorkflow: (id: string, planHash: string) =>
+    apiRequest(`/workflows/requests/${encodeURIComponent(id)}/execute`, WorkflowSchema, 'POST', {
+      planHash,
+    }),
+  reconcileWorkflow: (id: string) =>
+    apiRequest(
+      `/workflows/requests/${encodeURIComponent(id)}/reconcile`,
+      WorkflowSchema,
+      'POST',
+      {},
+    ),
+  saveWorkflowPolicy: (policy: WorkflowPolicy) =>
+    apiRequest('/workflows/policy', WorkflowPolicySchema, 'PUT', policy),
   state: () => apiRequest('/state', StateSchema),
   saveCompany: (company: CompanyProfile) => apiRequest('/company', CompanySchema, 'PUT', company),
   createCase: (record: CreateCaseInput) => apiRequest('/cases', CaseSchema, 'POST', record),
