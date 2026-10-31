@@ -1,0 +1,67 @@
+---
+import { COPY } from '../consts/copy';
+import ActionForm from './ActionForm.astro';
+const text = COPY.support;
+---
+
+<dialog id="case-dialog">
+  <ActionForm action="create"
+    ><div class="dialog-title">
+      <div><p class="eyebrow">{text.newCaseEyebrow}</p><h2>{text.newCaseTitle}</h2></div><button
+        type="button"
+        data-close-dialog
+        class="icon-button"
+        aria-label={text.newCaseTitle}>{COPY.symbols.close}</button
+      >
+    </div><p class="field-note">{text.newCaseBody}</p><div class="form-grid">
+      <label
+        >{text.customerName}<input
+          name="name"
+          required
+          maxlength="80"
+          placeholder={COPY.placeholders.customer}
+        /></label
+      ><label
+        >{text.requestSubject}<input
+          name="title"
+          required
+          maxlength="120"
+          placeholder={COPY.placeholders.subject}
+        /></label
+      ><label
+        >{text.amount}<input
+          type="number"
+          name="amount"
+          value="29"
+          min="0.01"
+          max="100000"
+          step="0.01"
+          required
+        /></label
+      ><label
+        >{text.age}<input
+          type="number"
+          name="ageDays"
+          value="1"
+          min="0"
+          max="3650"
+          required
+        /></label
+      >
+    </div><label
+      >{text.evidence}<select name="reason"
+        >{
+          Object.entries(COPY.reasons).map(([value, label]) => (
+            <option value={value}>{label}</option>
+          ))
+        }</select
+      ></label
+    ><label
+      >{text.message}<textarea
+        name="message"
+        required
+        maxlength="4000"
+        placeholder={COPY.placeholders.message}></textarea></label
+    ><button class="button-primary full-width" type="submit">{text.create}</button></ActionForm
+  >
+</dialog>

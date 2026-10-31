@@ -1,0 +1,118 @@
+---
+import { copyText } from '../helpers/copy';
+import { COPY } from '../consts/copy';
+import { fragmentUrl, workspaceUrl } from '../helpers/routes';
+import { formatTime, initials } from '../utils/format';
+import { supportMetrics } from '../services/support-view';
+import type { WorkspaceModel } from '../types/workspace';
+import PageHeading from './PageHeading.astro';
+import Conversation from './Conversation.astro';
+import DecisionBrief from './DecisionBrief.astro';
+import CaseDialog from './CaseDialog.astro';
+interface Props {
+  model: WorkspaceModel;
+}
+const { model } = Astro.props;
+const { state, record } = model;
+const text = COPY.support;
+const metrics = supportMetrics(state);
+---
+
+<PageHeading eyebrow={text.eyebrow} title={text.title} description={text.description}
+  ><button data-open-dialog type="button" class="button-secondary">{text.newRequest}</button
+  ></PageHeading
+>
+<div class="integration-row">
+  <span class="integration"
+    >{COPY.connections.modelValue}{COPY.separators.dot}{
+      state.connections.mistral ? COPY.connections.configured : COPY.connections.notConnected
+    }</span
+  ><span class="integration"
+    >{COPY.company.engine}{COPY.separators.dot}{COPY.engines[state.company.decisionEngine]}</span
+  ><span class="integration"
+    >{COPY.connections.billing}{COPY.separators.dot}{COPY.connections.testOnly}</span
+  >
+</div>
+<p class="policy-banner">
+  {
+    copyText.policySummary(
+      state.company.companyName,
+      state.company.duplicateOnly,
+      state.company.reviewAll,
+    )
+  }
+</p>
+<div class="metrics">
+  {
+    metrics.map((metric) => (
+      <div>
+        <>
+          <span>{metric.label}</span>
+          <strong>{metric.value}</strong>
+          <small>{metric.detail}</small>
+        </>
+      </div>
+    ))
+  }
+</div>
+<div class="work-grid">
+  <section class="panel inbox">
+    <div class="panel-heading">
+      <h2>{text.inbox} <span class="badge">{state.cases.length}</span></h2><span class="subtle"
+        >{text.cases}</span
+      >
+    </div><div class="case-list">
+      {
+        state.cases.map((item, index) => (
+          <a
+            class:list={['case-link', { 'is-active': item.id === record?.id }]}
+            href={workspaceUrl('support', item.id)}
+            hx-get={fragmentUrl('support', item.id)}
+            hx-target="#workspace"
+            hx-swap="innerHTML"
+            hx-push-url={workspaceUrl('support', item.id)}
+          >
+            <>
+              <div class="case-top">
+                <>
+                  <span class="avatar">{initials(item.name)}</span>
+                  <b>{item.name}</b>
+                  <small>{copyText.count(index + 1)}</small>
+                </>
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.message}</p>
+            </>
+          </a>
+        ))
+      }
+    </div><p class="inbox-footer">{text.synthetic}</p>
+  </section>
+  {record && <Conversation model={model} record={record} />}
+  <DecisionBrief model={model} />
+</div>
+<section class="panel ledger">
+  <div class="panel-heading">
+    <h2>{text.ledger} <span class="badge">{text.live}</span></h2><span class="subtle"
+      >{text.ledgerDetail}</span
+    >
+  </div><div class="events">
+    {
+      state.events.length ? (
+        state.events.map((event) => (
+          <div class="event">
+            <>
+              <code>{event.operationId.slice(0, 8)}</code>
+              <span class="event-state">{COPY.states[event.state]}</span>
+              <p>{COPY.events[event.code]}</p>
+              <time datetime={event.createdAt}>{formatTime(event.createdAt)}</time>
+            </>
+          </div>
+        ))
+      ) : (
+        <p class="subtle">{text.ledgerEmpty}</p>
+      )
+    }
+  </div>
+</section>
+<CaseDialog />
