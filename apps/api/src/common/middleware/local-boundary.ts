@@ -18,7 +18,13 @@ export function localBoundary(port: number, origin: string, internalToken: strin
     if (
       !allowRequest() ||
       (request.method === 'POST' &&
-        ['/api/intake', '/api/v1/agent/messages'].includes(request.path) &&
+        [
+          '/api/intake',
+          '/api/v1/agent/messages',
+          '/api/auth/begin',
+          '/api/auth/onboard',
+          '/api/auth/invite',
+        ].includes(request.path) &&
         !allowIntake())
     ) {
       response.setHeader('Retry-After', '60');

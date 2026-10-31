@@ -1,3 +1,9 @@
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { IdentityProviderService } from './auth/identity.provider';
+import { WorkspaceRegistry } from './tenancy/registry.service';
+import { scopedDataSource } from './tenancy/context';
+import { DataSource } from 'typeorm';
 import { PolicyContextService } from './support/prompts/policy-context.service';
 import { SupportOrchestrator } from './support/orchestration/support-orchestrator.service';
 import { WorkflowService } from './workflows/workflow.service';
@@ -30,10 +36,15 @@ import { BillingService } from './billing/billing.service';
 import { StripeProvider } from './billing/stripe.provider';
 @Module({
   imports: [
-    TypeOrmModule.forRoot(databaseOptions),
+    TypeOrmModule.forRootAsync({
+      useFactory: () => databaseOptions,
+      dataSourceFactory: async () =>
+        scopedDataSource(await new DataSource(databaseOptions).initialize()),
+    }),
     TypeOrmModule.forFeature(databaseOptions.entities),
   ],
   controllers: [
+    AuthController,
     CompanyController,
     ConnectionsController,
     SupportController,
@@ -45,6 +56,9 @@ import { StripeProvider } from './billing/stripe.provider';
     AgentController,
   ],
   providers: [
+    AuthService,
+    IdentityProviderService,
+    WorkspaceRegistry,
     BootstrapService,
     CompanyService,
     ConnectionsService,

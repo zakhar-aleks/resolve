@@ -1,3 +1,6 @@
+import { tenantBoundary } from './tenancy/middleware';
+import { AuthService } from './auth/auth.service';
+import { WorkspaceRegistry } from './tenancy/registry.service';
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { json, urlencoded } from 'express';
@@ -11,6 +14,7 @@ async function bootstrap(): Promise<void> {
   app.use(
     localBoundary(environment.API_PORT, environment.WEB_ORIGIN, environment.INTERNAL_API_TOKEN),
   );
+  app.use(tenantBoundary(app.get(AuthService), app.get(WorkspaceRegistry)));
   app.use(json({ limit: '80kb' }));
   app.use(urlencoded({ extended: false, limit: '80kb' }));
   app.useGlobalFilters(new ApiFilter());
