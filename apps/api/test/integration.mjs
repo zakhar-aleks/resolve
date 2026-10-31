@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import pg from 'pg';
+process.env.DATA_ENCRYPTION_KEY = '11'.repeat(32);
 const base = process.env.DATABASE_URL ?? 'postgresql://resolve:resolve@127.0.0.1:55432/resolve';
 const admin = new pg.Client({ connectionString: base });
 const name = `resolve_test_${randomUUID().replaceAll('-', '')}`;
@@ -30,6 +31,8 @@ before(
         ...process.env,
         DATABASE_URL: url.href,
         API_PORT: '8798',
+        ALLOW_BASIC_AUTH: 'true',
+        DATA_ENCRYPTION_KEY: '11'.repeat(32),
         INTERNAL_API_TOKEN: internalToken,
         RESOLVE_API_KEY: 'integration-agent-key-000000000000000000',
         RESOLVE_REVIEWER_KEY: 'integration-reviewer-key-000000000000000',
@@ -483,13 +486,11 @@ test('expired workflow content is removed while idempotency identity remains', a
   await client.connect();
   try {
     const row = (
-      await client.query(
-        `SELECT id FROM agent_workflows WHERE result->>'state'='succeeded' LIMIT 1`,
-      )
+      await client.query(`SELECT id FROM agent_workflows WHERE lifecycle='succeeded' LIMIT 1`)
     ).rows[0];
     assert.ok(row);
     await client.query(
-      `UPDATE agent_workflows SET result=jsonb_set(result,'{updatedAt}',to_jsonb('2020-01-01T00:00:00.000Z'::text)) WHERE id=$1`,
+      `UPDATE agent_workflows SET \"updatedAt\"='2020-01-01T00:00:00.000Z' WHERE id=$1`,
       [row.id],
     );
     await request('/privacy/retention', 'POST', {});
@@ -633,11 +634,16 @@ test('a recommendation completed after a policy change is discarded, not saved',
     release();
     const error = await pending;
     assert.equal(error.getResponse().code, 'POLICY_CHANGED');
-    const rows = await data.query(
-      `SELECT id FROM support_runs WHERE "caseId"=$1 AND result->'analysis'->>'source'='delayed-test'`,
-      [intake.reference],
+    const rows = await data.query(`SELECT result FROM support_runs WHERE "caseId"=$1`, [
+      intake.reference,
+    ]);
+    const { decrypt } = await import('../dist/security/encryption.js');
+    assert.equal(
+      rows.filter(
+        (row) => decrypt(row.result, 'support_runs.result').analysis.source === 'delayed-test',
+      ).length,
+      0,
     );
-    assert.equal(rows.length, 0);
   } finally {
     release?.();
     await data.destroy();
@@ -674,3 +680,130 @@ test('operator credentials do not bypass the origin boundary', async () => {
     403,
   );
 });
+test(
+  'company signup isolates databases, sessions, invitations, roles and API keys',
+  { timeout: 60000 },
+  async () => {
+    const { DataSource } = await import('typeorm');
+    const { databaseOptions } = await import('../dist/database/data-source.js');
+    const { WorkspaceRegistry } = await import('../dist/tenancy/registry.service.js');
+    const { scopedDataSource } = await import('../dist/tenancy/context.js');
+    const { AuthService } = await import('../dist/auth/auth.service.js');
+    const { AccountWorkspaceEntity, AccountUserEntity } =
+      await import('../dist/database/entities/account.entity.js');
+    const baseData = await new DataSource({ ...databaseOptions, url: url.href }).initialize();
+    const registry = new WorkspaceRegistry(scopedDataSource(baseData));
+    const fakeIdentity = {
+      config: () => ({
+        clientId: 'fixture',
+        secret: 'fixture',
+        authorize: 'https://accounts.example/authorize',
+      }),
+      callback: () => 'https://resolve.example/auth/callback/google',
+      exchange: async (_provider, code) => ({ subject: code, email: `${code}@example.com` }),
+    };
+    const auth = new AuthService(registry, fakeIdentity);
+    const created = [];
+    const login = async (subject) => {
+      const browserSecret = 'browser-binding-fixture-000000000000000000000000';
+      const start = await auth.begin('google', browserSecret);
+      const state = new URL(start.url).searchParams.get('state');
+      const result = await auth.callback('google', state, subject, browserSecret);
+      await assert.rejects(() => auth.callback('google', state, subject, browserSecret));
+      return result.token;
+    };
+    const scoped = async (token, path, method = 'GET', body) => {
+      const response = await fetch(origin + path, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Resolve-Internal': internalToken,
+          'X-Resolve-Session': token,
+        },
+        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      });
+      return { status: response.status, body: await response.json() };
+    };
+    try {
+      const first = await login('owner-one'),
+        second = await login('owner-two');
+      const one = await auth.onboard(first, 'First Company'),
+        two = await auth.onboard(second, 'Second Company');
+      created.push(one.workspaceId, two.workspaceId);
+      assert.notEqual(one.workspaceId, two.workspaceId);
+      assert.equal((await scoped(first, '/state')).body.company.companyName, 'First Company');
+      assert.equal((await scoped(second, '/state')).body.company.companyName, 'Second Company');
+      assert.equal((await scoped(first, '/state')).body.cases.length, 0);
+      const message = (
+        await scoped(first, '/intake', 'POST', {
+          name: 'Private Customer',
+          title: 'Private request',
+          message: 'Private message for first company',
+          aiPreference: 'human_only',
+        })
+      ).body;
+      assert.ok(message.reference);
+      assert.equal((await scoped(second, '/state')).body.cases.length, 0);
+      assert.equal(
+        (
+          await scoped(second, `/cases/${message.reference}`, 'PATCH', {
+            tags: [],
+            assignee: '',
+            status: 'open',
+            aiPreference: 'human_only',
+          })
+        ).status,
+        404,
+      );
+      await assert.rejects(() => auth.switchWorkspace(first, two.workspaceId));
+      const invite = await auth.invite(first, 'owner-two@example.com', 'agent');
+      const inviteToken = new URL(invite.url).searchParams.get('token');
+      await assert.rejects(() => auth.acceptInvite(first, inviteToken));
+      await auth.acceptInvite(second, inviteToken);
+      await assert.rejects(() => auth.acceptInvite(second, inviteToken));
+      assert.equal((await scoped(second, '/state')).body.company.companyName, 'First Company');
+      const settings = (await scoped(second, '/company')).body;
+      assert.equal((await scoped(second, '/company', 'PUT', settings)).status, 403);
+      await assert.rejects(() => auth.invite(second, 'intruder@example.com', 'reviewer'));
+      await assert.rejects(() => auth.apiKeys(second));
+      const keys = await auth.apiKeys(first);
+      const api = async (key) =>
+        fetch(origin + '/v1/agent/policy', { headers: { Authorization: `Bearer ${key}` } });
+      assert.equal((await api(keys.intake)).status, 200);
+      const rotated = await auth.apiKeys(first);
+      assert.equal((await api(keys.intake)).status, 401);
+      assert.equal((await api(rotated.intake)).status, 200);
+      const staff = (await auth.profile(second)).userId;
+      await auth.removeMember(first, staff);
+      assert.equal((await scoped(second, '/state')).status, 401);
+      await auth.switchWorkspace(second, two.workspaceId);
+      assert.equal((await scoped(second, '/state')).body.company.companyName, 'Second Company');
+      const workspace = await registry.catalogue
+        .getRepository(AccountWorkspaceEntity)
+        .findOneByOrFail({ id: one.workspaceId });
+      const source = await registry.source(workspace);
+      const raw = (
+        await source.query('SELECT name,message FROM support_cases WHERE id=$1', [
+          message.reference,
+        ])
+      )[0];
+      assert.ok(raw.name.startsWith('enc1.'));
+      assert.ok(!raw.message.includes('Private message'));
+      const rawUser = (await baseData.query('SELECT email FROM account_users LIMIT 1'))[0];
+      assert.ok(rawUser.email.startsWith('enc1.'));
+      const again = await login('owner-one');
+      assert.equal((await auth.profile(again)).termsAccepted, true);
+      await auth.logout(first);
+      assert.equal((await scoped(first, '/state')).status, 401);
+      assert.ok((await baseData.getRepository(AccountUserEntity).count()) >= 2);
+    } finally {
+      await registry.onApplicationShutdown();
+      // The API process may also hold scoped pools; terminate those connections in the disposable test databases.
+      for (const id of created) {
+        const database = `resolve_t_${id.replaceAll('-', '')}`;
+        await admin.query(`DROP DATABASE IF EXISTS "${database}" WITH (FORCE)`);
+      }
+      await baseData.destroy();
+    }
+  },
+);

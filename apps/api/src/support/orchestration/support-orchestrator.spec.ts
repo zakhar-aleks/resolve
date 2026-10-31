@@ -31,7 +31,9 @@ const record = CaseSchema.parse({
 const policies = new PolicyContextService(
   new DataSource({ type: 'postgres', url: 'postgresql://unused' }),
 );
-const connections = new ConnectionsService();
+const connections = new ConnectionsService(
+  new DataSource({ type: 'postgres', url: 'postgresql://unused' }),
+);
 const mistral = new MistralProvider(connections, policies);
 const jev = new JevProvider(connections, policies);
 const orchestrator = new SupportOrchestrator(connections, mistral, jev);

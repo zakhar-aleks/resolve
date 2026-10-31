@@ -32,7 +32,9 @@ const requests: Array<{ model: string; messages: Array<{ role: string; content: 
 const policies = new PolicyContextService(
   new DataSource({ type: 'postgres', url: 'postgresql://unused' }),
 );
-const connections = new ConnectionsService();
+const connections = new ConnectionsService(
+  new DataSource({ type: 'postgres', url: 'postgresql://unused' }),
+);
 const provider = new MistralProvider(connections, policies);
 beforeEach(() => {
   requests.length = 0;

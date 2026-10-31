@@ -33,7 +33,9 @@ it('uses the same policy foundation for optional Jev routing and judgment', asyn
     paymentStatus: 'paid',
     subscriptionStatus: 'active',
   });
-  const connections = new ConnectionsService();
+  const connections = new ConnectionsService(
+    new DataSource({ type: 'postgres', url: 'postgresql://unused' }),
+  );
   vi.spyOn(connections, 'getJevKey').mockReturnValue('mock-key');
   const policies = new PolicyContextService(
     new DataSource({ type: 'postgres', url: 'postgresql://unused' }),
